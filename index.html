@@ -3,20 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Controle de Dívidas</title>
-<meta name="theme-color" content="#820ad1">
+<title>Quem Me Deve</title>
+<meta name="theme-color" content="#0a3bc2">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Quem Me Deve">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 <header class="hero"><div class="wrap">
 <div class="top">
-<div class="brand"><span class="logo" aria-hidden="true">R$</span><div><h1>Controle de Dívidas</h1><p id="hello">Quem deve, quanto falta e o que já foi pago.</p></div></div>
+<div class="brand"><span class="logo"><img src="logo.png" alt="Quem Me Deve"></span><div><h1>Quem Me Deve</h1><p id="hello">Quem deve, quanto falta e o que já foi pago.</p></div></div>
 <div class="tools"><button class="ib" id="rkb" title="Ranking de pagadores" aria-label="Ranking">🏆</button><button class="ib" id="tb" title="Lixeira" aria-label="Lixeira">🗑 <span class="bn" id="bn" hidden>0</span></button><button class="ib" id="cfg" title="Configurações" aria-label="Configurações">⚙</button></div>
 </div>
 <div class="chips"><span class="chip">👥 <b id="h_p">0</b> pessoas</span><span class="chip">⏳ <b id="h_n">0</b> pendentes</span><span class="chip">✅ <b id="h_k">0</b> pagas</span></div>
@@ -46,7 +48,7 @@
 
 <div class="grid">
 <section>
-<div class="sh"><h2>Dívidas <span class="s" id="cnt"></span></h2><div class="shb"><button class="sec" id="selb">☑ Selecionar</button><button class="add reg" id="rg">＋ Registrar</button></div></div>
+<div class="sh"><h2>Dívidas <span class="s" id="cnt"></span></h2><div class="shb"><button class="sec" id="vw">▦ Tabela</button><button class="sec" id="selb">☑ Selecionar</button><button class="add reg" id="rg">＋ Registrar</button></div></div>
 <div class="filters">
 <div class="full"><label for="q">Buscar</label><input id="q" type="search" placeholder="Descrição, pessoa, origem..."></div>
 <div><label for="fm">Mês</label><select id="fm"></select></div>
@@ -88,6 +90,7 @@
 <h2 class="full">Parcelas</h2>
 <p class="s full" id="k_t"></p>
 <div class="full" id="k_l"></div>
+<button class="sec full" type="button" id="k_rc">🧾 Recibo desta dívida</button>
 <button class="sec full" type="button" id="k_all">Marcar todas como pagas</button>
 <button class="sec" type="button" data-close="kd">Cancelar</button><button class="add" type="submit">Salvar</button>
 </form></dialog>
@@ -162,9 +165,15 @@
 
 <div id="selbar" hidden><span id="sel_n">0 selecionadas</span><button class="sec" id="s_all">Todas</button><button class="add" id="s_pay">Pagar</button><button class="sec" id="s_date">Mover data</button><button class="sec" id="s_del">Apagar</button><button class="sec" id="s_x" aria-label="Sair">✕</button></div>
 
-<div id="lock"><div class="lk"><div class="logo">R$</div><h2>Controle de Dívidas</h2><p class="s" id="lk_m">Digite seu PIN</p><div class="dots" id="lk_d"></div><div class="pad" id="lk_p"></div></div></div>
+<div id="lock"><div class="lk"><div class="logo"><img src="logo.png" alt=""></div><h2>Quem Me Deve</h2><p class="s" id="lk_m">Digite seu PIN</p><div class="dots" id="lk_d"></div><div class="pad" id="lk_p"></div></div></div>
+
+<dialog id="recd"><div id="rc_b"></div>
+<div class="fg rc-act">
+<button class="add" id="rc_w">Enviar no WhatsApp</button><button class="sec" id="rc_i">Imagem</button>
+<button class="sec" id="rc_c">Copiar texto</button><button class="sec" id="rc_p">Imprimir / PDF</button>
+<button class="sec full" data-close="recd">Fechar</button></div></dialog>
 
 <div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
-<script src="script.js?v=7"></script>
+<script src="script.js?v=10"></script>
 </body>
 </html>

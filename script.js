@@ -118,15 +118,32 @@ function render(){
   Object.keys(g).sort().forEach(function(w){
     var pend=0,gT=0,gG=0;g[w].forEach(function(x){pend+=rem(x);gT+=x.amount;gG+=got(x)});var pc=gT?Math.round(gG/gT*100):0;
     var ew=encodeURIComponent(w);
-    h+='<div class="group"><div class="gh">'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button><span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-x="'+ew+'">Extrato</button><button data-q="'+ew+'">Quitar tudo</button></div></div><div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
-    g[w].sort(function(a,b){return a.paid-b.paid||(b.month>a.month?1:-1)}).forEach(function(x){
+    h+='<div class="group"><div class="gh">'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button><span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-x="'+ew+'">Extrato</button><button data-rb="'+ew+'">Recibo</button><button data-q="'+ew+'">Quitar tudo</button></div></div><div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
+    var gk={},ord=[];
+    g[w].forEach(function(x){
+      var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;
+      if(!gk[k]){gk[k]={all:s.length?s:[x],rows:[],o:"9999"};ord.push(gk[k])}
+      gk[k].rows.push(x);
+      if(rem(x)>0){var dk=x.date||x.month+"-01";if(dk<gk[k].o)gk[k].o=dk}
+    });
+    ord.sort(function(a,b){return a.o<b.o?-1:a.o>b.o?1:0});
+    ord.forEach(function(G){
+      var multi=G.all.length>1,np=0,dT=0,dP=0,dR=0;
+      G.all.forEach(function(y){if(y.paid)np++;dT+=y.amount;dP+=got(y);dR+=rem(y)});
+      h+='<div class="debt'+(multi?"":" one")+'">';
+      if(multi){var dp=dT?Math.round(dP/dT*100):0;
+        h+='<div class="dh"><div class="dt"><b>'+esc(G.all[0].desc.replace(/\s*\d+\/\d+$/,""))+'</b><span class="s">'+np+' de '+G.all.length+' parcelas pagas · falta '+brl(dR)+'</span></div><div class="dbtn"><button class="pcs" data-k="'+G.all[0].id+'">Parcelas</button><button class="pcs" data-rc="'+G.all[0].id+'">Recibo</button></div></div><div class="pb" title="'+dp+'% pago"><i style="width:'+dp+'%"></i></div>';
+      }
+      G.rows.sort(function(a,b){return (a.paid?1:0)-(b.paid?1:0)||((a.date||a.month)<(b.date||b.month)?-1:1)}).forEach(function(x){
       var gt=got(x),part=!x.paid&&gt>0,sub=[x.date?fdate(x.date):monthName(x.month)];
       var meta=(x.cat?'<span class="c">'+esc(x.cat)+'</span>':"")+sub[0]+(x.note?" · "+esc(x.note):"")+(x.paid&&x.paidAt?" · pago em "+ddmm(x.paidAt):"");
-      h+='<div class="it'+(x.paid?" paid":"")+(sel.has(x.id)?" sel":"")+cls+'" style="animation-delay:'+Math.min(n++,12)*45+'ms">'+(selMode?'<input type="checkbox" class="sk" data-s="'+x.id+'"'+(sel.has(x.id)?" checked":"")+' aria-label="Selecionar">':"")+'<div class="m"><div class="d">'+esc(x.desc)+'</div><div class="s">'+meta+'</div>'+(part?'<div class="pb"><i style="width:'+Math.round(gt/x.amount*100)+'%"></i></div>':"")+'</div><div class="v">'+brl(x.amount)+(part?'<small>falta '+brl(rem(x))+'</small>':"")+'</div><button class="tg '+(x.paid?"o":"p")+'" data-t="'+x.id+'">'+(x.paid?"Pago":"Pendente")+'</button>'+(x.proof?'<button class="pcs" data-v="'+x.id+'">📎 Comprovante</button>':x.paid?'<button class="pcs" data-a="'+x.id+'">+ Comprovante</button>':"")+(sib(x.id).length?'<button class="pcs" data-k="'+x.id+'">Parcelas</button>':"")+'<button class="x" data-e="'+x.id+'" title="Editar">✎</button><button class="x" data-d="'+x.id+'" title="Apagar">✕</button></div>';
+      h+='<div class="it'+(x.paid?" paid":"")+(sel.has(x.id)?" sel":"")+cls+'" style="animation-delay:'+Math.min(n++,12)*45+'ms">'+(selMode?'<input type="checkbox" class="sk" data-s="'+x.id+'"'+(sel.has(x.id)?" checked":"")+' aria-label="Selecionar">':"")+'<div class="m"><div class="d">'+esc(x.desc)+'</div><div class="s">'+meta+'</div>'+(part?'<div class="pb"><i style="width:'+Math.round(gt/x.amount*100)+'%"></i></div>':"")+'</div><div class="v">'+brl(x.amount)+(part?'<small>falta '+brl(rem(x))+'</small>':"")+'</div><button class="tg '+(x.paid?"o":"p")+'" data-t="'+x.id+'">'+(x.paid?"Pago":"Pendente")+'</button>'+(x.proof?'<button class="pcs" data-v="'+x.id+'">📎 Comprovante</button>':x.paid?'<button class="pcs" data-a="'+x.id+'">+ Comprovante</button>':"")+'<button class="x" data-e="'+x.id+'" title="Editar">✎</button><button class="x" data-d="'+x.id+'" title="Apagar">✕</button></div>';
+      });
+      h+='</div>';
     });
     h+='</div>';
   });
-  $("list").innerHTML=h||'<div class="empty">Nenhuma dívida encontrada. Adicione no formulário ou ajuste os filtros.</div>';
+  $("list").innerHTML=(view==="table"&&!selMode)?tableHTML(v):h||'<div class="empty">Nenhuma dívida encontrada. Adicione no formulário ou ajuste os filtros.</div>';
   if(v.length)first=false;
   sel.forEach(function(i){if(!items.some(function(x){return x.id===i}))sel.delete(i)});
   dash(v,tp,tk);recv();renderBin();selN();
@@ -171,7 +188,7 @@ function dash(v,tp,tk){
 
 /* ---------- arquivos (backup e CSV) ---------- */
 function say(t){$("bs").textContent=t}
-function backupText(){return "// Backup Controle de Dívidas, "+today()+"\nwindow.DIVIDAS_BACKUP = "+JSON.stringify(items,null,2)+";\nwindow.DIVIDAS_PESSOAS = "+JSON.stringify(people)+";\n"}
+function backupText(){return "// Backup Quem Me Deve, "+today()+"\nwindow.DIVIDAS_BACKUP = "+JSON.stringify(items,null,2)+";\nwindow.DIVIDAS_PESSOAS = "+JSON.stringify(people)+";\n"}
 async function saveFile(name,text,mime,okMsg){
   try{var d=window.claude?await claude.use("downloads"):null;if(d){await d.save({filename:name,data:text});say(okMsg);return}}catch(e){}
   var a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;document.body.appendChild(a);a.click();a.remove();say(okMsg);
@@ -208,9 +225,9 @@ function sib(id){
   var r=items.filter(function(x){return x.id.indexOf(p)===0}).sort(function(a,b){return a.month<b.month?-1:a.month>b.month?1:0});
   return r.length>1?r:[];
 }
-var kIds=[],sibs=[];
+var kIds=[],sibs=[],kRef="";
 function openParcels(id){
-  var r=sib(id);if(!r.length)return;kIds=r.map(function(x){return x.id});
+  var r=sib(id);if(!r.length)r=items.filter(function(x){return x.id===id});if(!r.length)return;kIds=r.map(function(x){return x.id});kRef=r[0].id;
   $("k_t").textContent=r[0].who+" · marque as parcelas pagas";
   $("k_l").innerHTML=r.map(function(x){return '<label class="pl"><input type="checkbox" data-k="'+x.id+'"'+(x.paid?" checked":"")+'><span>'+esc(x.desc)+' <small class="s">'+monthName(x.month)+'</small></span><b>'+brl(x.amount)+'</b></label>'}).join("");
   $("kd").showModal();
@@ -358,7 +375,7 @@ $("v_rm").addEventListener("click",function(){
 var editId=null,editName=null,photo="";
 function closeDlg(d){if(d.open)d.close()}
 document.querySelectorAll("[data-close]").forEach(function(b){b.addEventListener("click",function(){closeDlg($(b.dataset.close))})});
-["ed","pd","kd","xd","vd","td","rd","cd","rk","im","sd"].forEach(function(i){$(i).addEventListener("click",function(e){if(e.target===$(i))closeDlg($(i))})});
+["ed","pd","kd","xd","vd","td","rd","cd","rk","im","sd","recd"].forEach(function(i){$(i).addEventListener("click",function(e){if(e.target===$(i))closeDlg($(i))})});
 
 function cobrar(w){
   var p=items.filter(function(x){return x.who===w&&rem(x)>0});
@@ -415,6 +432,7 @@ $("pf").addEventListener("submit",function(e){
 });
 
 $("list").addEventListener("click",function(e){
+  var tr=e.target.closest("tr.gr");if(tr){snd("tap");openParcels(tr.dataset.g);return}
   if(e.target.classList&&e.target.classList.contains("sk")){
     var sid=e.target.dataset.s;if(e.target.checked)sel.add(sid);else sel.delete(sid);
     e.target.closest(".it").classList.toggle("sel",e.target.checked);selN();return;
@@ -422,6 +440,8 @@ $("list").addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;
   var D=b.dataset;
   if(D.w){cobrar(decodeURIComponent(D.w));return}
+  if(D.rb){snd("tap");openRecibo(decodeURIComponent(D.rb));return}
+  if(D.rc){var ri=items.find(function(x){return x.id===D.rc});if(ri){snd("tap");openRecibo(ri.who,D.rc)}return}
   if(D.x){snd("tap");openStmt(decodeURIComponent(D.x));return}
   if(D.r){snd("tap");openPerson(decodeURIComponent(D.r));return}
   if(D.q){
@@ -503,6 +523,138 @@ $("inst").addEventListener("click",function(){
 });
 window.addEventListener("appinstalled",function(){toast("App instalado!")});
 if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register("sw.js").catch(function(){})}
+
+/* ---------- recibo ---------- */
+var recCur=null;
+function recData(w,id){
+  var keyOf=function(x){var s=sib(x.id);return s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id};
+  var ref=id?items.find(function(x){return x.id===id}):null,want=ref?keyOf(ref):null,seen={},debts=[];
+  items.filter(function(x){return x.who===w}).forEach(function(x){
+    var k=keyOf(x);if((want&&k!==want)||seen[k])return;seen[k]=1;
+    var s=sib(x.id),r=(s.length?s:[x]).slice().sort(function(a,b){var p=a.date||a.month,q=b.date||b.month;return p<q?-1:p>q?1:0});
+    var d={title:r[0].desc.replace(/\s*\d+\/\d+$/,""),n:r.length,np:0,tot:0,pd:0,rs:0,next:null,parcels:[]};
+    r.forEach(function(y){
+      d.tot+=y.amount;d.pd+=got(y);d.rs+=rem(y);if(y.paid)d.np++;if(rem(y)>0&&!d.next)d.next=y;
+      var m=y.desc.match(/(\d+\/\d+)$/);
+      d.parcels.push({lbl:m?m[1]:"Única",amount:y.amount,paid:!!y.paid,part:(!y.paid&&got(y)>0)?got(y):0,when:y.paid&&y.paidAt?fdate(y.paidAt):"",due:y.date?fdate(y.date):monthName(y.month)});
+    });
+    d.nextDue=d.next?(d.next.date?fdate(d.next.date):monthName(d.next.month)):"";
+    debts.push(d);
+  });
+  var tk=0,tr=0;debts.forEach(function(d){tk+=d.pd;tr+=d.rs});
+  var n=new Date();
+  return {name:w,debts:debts,tk:tk,tr:tr,date:n.toLocaleDateString("pt-BR"),no:n.getFullYear()+pad(n.getMonth()+1)+pad(n.getDate())+"-"+pad(n.getHours())+pad(n.getMinutes())};
+}
+function recText(R){
+  var t="RECIBO · Quem Me Deve\nNº "+R.no+"\nCliente: "+R.name+"\nEmitido em "+R.date+"\n";
+  R.debts.forEach(function(d){
+    t+="\n"+d.title.toUpperCase()+"\nParcelas pagas: "+d.np+" de "+d.n+"\nValor total: "+brl(d.tot)+"\nJá pago: "+brl(d.pd)+"\nFalta: "+brl(d.rs)+"\n";
+    d.parcels.forEach(function(p){t+=(p.paid?"✓ ":"• ")+p.lbl+" · "+brl(p.amount)+" · "+(p.paid?(p.when?"pago em "+p.when:"pago"):(p.part?"parcial "+brl(p.part)+" · ":"")+"vence "+p.due)+"\n"});
+    t+=d.nextDue?"Próximo vencimento: "+d.nextDue+"\n":"Dívida quitada ✓\n";
+  });
+  return t+"\nTOTAL PAGO: "+brl(R.tk)+"\nFALTA PAGAR: "+brl(R.tr)+"\n\nObrigado!";
+}
+function recHTML(R){
+  return '<div class="rc-h"><img src="logo.png" alt=""><div><h2>Recibo</h2><div class="s">Quem Me Deve · Nº '+R.no+'</div><div class="s">Emitido em '+R.date+'</div></div></div>'+
+  '<div class="rc-cl"><span class="s">Cliente</span><b>'+esc(R.name)+'</b></div>'+
+  R.debts.map(function(d){
+    var pc=d.tot?Math.round(d.pd/d.tot*100):0;
+    return '<div class="rc-debt"><div class="rc-dt"><b>'+esc(d.title)+'</b><span class="s">'+d.np+' de '+d.n+' parcela(s) paga(s)</span></div><div class="pb"><i style="width:'+pc+'%"></i></div>'+
+    '<div class="rc-stats"><div><small>Total</small><b>'+brl(d.tot)+'</b></div><div class="ok"><small>Já pago</small><b>'+brl(d.pd)+'</b></div><div class="pe"><small>Falta</small><b>'+brl(d.rs)+'</b></div></div>'+
+    d.parcels.map(function(p){return '<div class="rc-p'+(p.paid?" ok":"")+'"><span>'+(p.paid?"✓":"•")+" "+p.lbl+'</span><span class="s">'+(p.paid?(p.when?"pago em "+p.when:"pago"):(p.part?"parcial "+brl(p.part)+" · ":"")+"vence "+p.due)+'</span><b>'+brl(p.amount)+'</b></div>'}).join("")+
+    (d.nextDue?'<div class="s" style="margin-top:10px">Próximo vencimento: <b>'+d.nextDue+'</b></div>':'<div class="rc-q">Dívida quitada ✓</div>')+'</div>';
+  }).join("")+
+  '<div class="rc-t"><div><small>Total pago</small><b>'+brl(R.tk)+'</b></div><div><small>Falta pagar</small><b>'+brl(R.tr)+'</b></div></div>'+
+  '<p class="s" style="text-align:center;margin:12px 0 0">Este recibo confirma os pagamentos registrados até '+R.date+'. Obrigado!</p>';
+}
+function openRecibo(w,id){
+  recCur=recData(w,id);
+  if(!recCur.debts.length){toast("Nada para o recibo.");return}
+  $("rc_b").innerHTML=recHTML(recCur);$("recd").showModal();
+}
+$("k_rc").addEventListener("click",function(){var it=items.find(function(x){return x.id===kRef});if(!it)return;closeDlg($("kd"));openRecibo(it.who,kRef)});
+$("rc_c").addEventListener("click",function(){
+  (navigator.clipboard?navigator.clipboard.writeText(recText(recCur)):Promise.reject()).then(function(){toast("Recibo copiado.");snd("ok")},function(){toast("Não consegui copiar. Use o WhatsApp.")});
+});
+$("rc_w").addEventListener("click",function(){snd("wa");window.open("https://wa.me/"+waNum((people[recCur.name]||{}).phone)+"?text="+encodeURIComponent(recText(recCur)),"_blank","noopener")});
+$("rc_p").addEventListener("click",function(){window.print()});
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+$("rc_i").addEventListener("click",function(){
+  var R=recCur,lg=new Image();
+  lg.onload=function(){draw(true)};lg.onerror=function(){draw(false)};lg.src="logo.png";
+  function draw(ok){
+    var W=760,P=34,LH=30,H=240;
+    R.debts.forEach(function(d){H+=148+d.parcels.length*LH+34+18});
+    H+=110+70;
+    var cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=H*sc;
+    var g=cv.getContext("2d");g.scale(sc,sc);
+    g.fillStyle="#fff";g.fillRect(0,0,W,H);
+    var gr=g.createLinearGradient(0,0,W,150);gr.addColorStop(0,"#071f6e");gr.addColorStop(1,"#1d6bff");g.fillStyle=gr;g.fillRect(0,0,W,150);
+    if(ok)g.drawImage(lg,P,24,102,102);
+    g.textAlign="left";g.fillStyle="#ffd21f";g.font="800 38px system-ui,sans-serif";g.fillText("RECIBO",P+120,70);
+    g.fillStyle="#fff";g.font="600 16px system-ui,sans-serif";g.fillText("Quem Me Deve",P+120,98);
+    g.textAlign="right";g.font="14px system-ui,sans-serif";g.fillText("Nº "+R.no,W-P,62);g.fillText("Emitido em "+R.date,W-P,86);
+    g.textAlign="left";g.fillStyle="#6a79a8";g.font="700 12px system-ui,sans-serif";g.fillText("CLIENTE",P,184);
+    g.fillStyle="#0a1a45";g.font="800 28px system-ui,sans-serif";g.fillText(R.name,P,214);
+    var y=240,x0=P+20,xr=W-P-20;
+    R.debts.forEach(function(d){
+      var bh=148+d.parcels.length*LH+34;
+      g.strokeStyle="#cfdaf7";g.lineWidth=1.5;g.setLineDash([6,5]);rr(g,P,y,W-2*P,bh,18);g.stroke();g.setLineDash([]);
+      g.textAlign="left";g.fillStyle="#0a1a45";g.font="800 20px system-ui,sans-serif";g.fillText(d.title,x0,y+36);
+      g.textAlign="right";g.fillStyle="#6a79a8";g.font="600 14px system-ui,sans-serif";g.fillText(d.np+" de "+d.n+" parcela(s) paga(s)",xr,y+36);
+      g.fillStyle="#e3eaff";rr(g,x0,y+50,xr-x0,8,4);g.fill();
+      var pc=d.tot?d.pd/d.tot:0;if(pc>0){g.fillStyle="#16a34a";rr(g,x0,y+50,Math.max(8,(xr-x0)*pc),8,4);g.fill()}
+      var bw=(xr-x0-20)/3,st=[["TOTAL",brl(d.tot),"#0a1a45"],["JÁ PAGO",brl(d.pd),"#15803d"],["FALTA",brl(d.rs),"#b45309"]];
+      st.forEach(function(q,i){var bx=x0+i*(bw+10);g.fillStyle="#f1f5ff";rr(g,bx,y+72,bw,58,12);g.fill();g.textAlign="center";g.fillStyle="#6a79a8";g.font="700 10px system-ui,sans-serif";g.fillText(q[0],bx+bw/2,y+92);g.fillStyle=q[2];g.font="800 17px system-ui,sans-serif";g.fillText(q[1],bx+bw/2,y+115)});
+      d.parcels.forEach(function(p,i){
+        var py=y+158+i*LH;
+        g.textAlign="left";g.font="700 15px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":"#0a1a45";g.fillText((p.paid?"✓ ":"• ")+p.lbl,x0,py);
+        g.font="14px system-ui,sans-serif";g.fillStyle="#6a79a8";g.fillText(p.paid?(p.when?"pago em "+p.when:"pago"):(p.part?"parcial "+brl(p.part)+" · ":"")+"vence "+p.due,x0+100,py);
+        g.textAlign="right";g.font="700 15px system-ui,sans-serif";g.fillStyle="#0a1a45";g.fillText(brl(p.amount),xr,py);
+      });
+      var ly=y+158+d.parcels.length*LH+8;
+      g.textAlign="left";g.font="700 14px system-ui,sans-serif";
+      if(d.nextDue){g.fillStyle="#6a79a8";g.fillText("Próximo vencimento: "+d.nextDue,x0,ly)}else{g.fillStyle="#15803d";g.fillText("Dívida quitada ✓",x0,ly)}
+      y+=bh+18;
+    });
+    var yg=g.createLinearGradient(P,y,W-P,y+90);yg.addColorStop(0,"#ffd21f");yg.addColorStop(1,"#ffb300");g.fillStyle=yg;rr(g,P,y,W-2*P,90,20);g.fill();
+    g.fillStyle="#0a1a45";g.textAlign="left";g.font="800 11px system-ui,sans-serif";g.fillText("TOTAL PAGO",x0,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tk),x0,y+66);
+    g.textAlign="right";g.font="800 11px system-ui,sans-serif";g.fillText("FALTA PAGAR",xr,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tr),xr,y+66);
+    g.textAlign="center";g.fillStyle="#6a79a8";g.font="12px system-ui,sans-serif";g.fillText("Este recibo confirma os pagamentos registrados até "+R.date+". Obrigado!",W/2,y+90+36);
+    cv.toBlob(function(b){
+      var f=new File([b],"recibo-"+R.name.replace(/\s+/g,"-")+".png",{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){});return}
+      var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();toast("Imagem do recibo baixada.");snd("ok");
+    });
+  }
+});
+
+/* ---------- visão em tabela ---------- */
+var view=LS.get("dv-view")==="table"?"table":"cards";
+function vwBtn(){$("vw").textContent=view==="table"?"☰ Cards":"▦ Tabela"}
+vwBtn();
+$("vw").addEventListener("click",function(){view=view==="table"?"cards":"table";LS.set("dv-view",view);vwBtn();snd("tap");render()});
+function tableHTML(v){
+  var seen={},gs=[];
+  v.forEach(function(x){
+    var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;
+    if(seen[k])return;seen[k]=1;
+    var r=s.length?s:[x],o={id:x.id,who:x.who,desc:r[0].desc.replace(/\s*\d+\/\d+$/,""),n:r.length,tot:0,pd:0,rs:0,np:0,nx:null};
+    r.forEach(function(y){o.tot+=y.amount;o.pd+=got(y);o.rs+=rem(y);if(y.paid)o.np++;if(rem(y)>0&&!o.nx)o.nx=y});
+    o.key=o.nx?(o.nx.date||o.nx.month+"-01"):"9999";
+    gs.push(o);
+  });
+  if(!gs.length)return '<div class="empty">Nenhuma dívida encontrada. Adicione no botão Registrar ou ajuste os filtros.</div>';
+  gs.sort(function(a,b){return a.who.localeCompare(b.who)||(a.key<b.key?-1:a.key>b.key?1:0)});
+  var T=0,P=0,R=0;
+  var rows=gs.map(function(o){
+    T+=o.tot;P+=o.pd;R+=o.rs;
+    var due=o.nx?(o.nx.date?fdate(o.nx.date):monthName(o.nx.month)):'<span class="q">Quitado</span>';
+    var sub=o.n>1?'<small>'+o.np+(o.np===1?" paga":" pagas")+'</small>':(o.np?'<small>paga</small>':"");
+    return '<tr class="gr" data-g="'+o.id+'" title="Ver parcelas"><td class="n">'+av(o.who)+esc(o.who)+'</td><td>'+esc(o.desc)+'</td><td class="v">'+brl(o.tot)+'</td><td class="num">'+o.n+'x'+sub+'</td><td class="num">'+brl(o.pd)+'</td><td class="r'+(o.rs<=0?" z":"")+'">'+brl(o.rs)+'</td><td class="num">'+due+'</td></tr>';
+  }).join("");
+  return '<div class="tw"><table><thead><tr><th>Nome</th><th>Descrição</th><th>Valor total</th><th>Parcelas</th><th>Já pago</th><th>Restante</th><th>Vencimento</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td colspan="2">Total · '+gs.length+' dívida(s)</td><td>'+brl(T)+'</td><td></td><td>'+brl(P)+'</td><td>'+brl(R)+'</td><td></td></tr></tfoot></table></div>';
+}
 
 /* ---------- histórico de mudanças ---------- */
 var TRK={desc:"Descrição",who:"Nome",cat:"Origem",amount:"Valor",date:"Data",note:"Observação",paid:"Situação",got:"Pago parcial"};
