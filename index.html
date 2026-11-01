@@ -13,11 +13,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=12">
+<link rel="stylesheet" href="style.css?v=13">
 </head>
 <body>
 <div class="app">
 <aside class="side">
+<canvas id="fx2" aria-hidden="true"></canvas>
 <div class="sb-logo"><img src="logo.png" alt="Quem Me Deve"></div>
 <nav class="nav" aria-label="Menu">
 <button class="nv on" data-nv="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></button>
@@ -37,6 +38,7 @@
 </header>
 
 <main class="page">
+<canvas id="fx" aria-hidden="true"></canvas>
 <section id="v_home">
 <div class="banner rise"><img src="banner.webp" alt="Quem Me Deve? Controle suas dívidas de forma simples e eficiente!"></div>
 
@@ -154,6 +156,7 @@
 <h2>⚙ Configurações</h2>
 <div class="cg"><h3>Som e aparência</h3>
 <div class="cr"><span>Sons do site</span><button class="sec" id="snd">Ligado</button></div>
+<div class="cr"><span>Efeitos e partículas</span><button class="sec" id="fxb">Ligado</button></div>
 <div class="cr"><span>Tema</span><select id="th"><option value="">Claro</option><option value="dark">Escuro</option></select></div></div>
 <div class="cg"><h3>Segurança</h3>
 <div class="cr"><span>Pedir PIN ao abrir</span><button class="sec" id="pin_t">Ativado</button></div>
@@ -204,6 +207,8 @@
 <button class="sec" type="button" data-close="dg">Cancelar</button><button class="add" type="submit">Salvar</button></form></dialog>
 
 <div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
-<script src="script.js?v=12"></script>
+<canvas id="fxc" aria-hidden="true"></canvas>
+<script src="script.js?v=13"></script>
+<script src="efeitos.js?v=13"></script>
 </body>
 </html>

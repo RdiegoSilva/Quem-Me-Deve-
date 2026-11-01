@@ -3,7 +3,7 @@
    01 Tokens · 02 Base · 03 Botões e campos · 04 Estrutura (menu e topo)
    05 Início (banner, resumo, ações) · 06 Minhas Dívidas (painel e tabela)
    07 Cards por pessoa · 08 Relatórios · 09 Janelas · 10 Avisos e PIN
-   11 Responsivo e impressão
+   11 Efeitos · 12 Responsivo e impressão
    ========================================================== */
 
 /* 01 · Tokens */
@@ -327,9 +327,34 @@ dialog#recd{width:min(580px,94vw)}
 .pad button:hover{background:rgba(255,255,255,.2)}
 .pad .nb{visibility:hidden}
 
-/* 11 · Responsivo e impressão */
+/* 11 · Efeitos (partículas, brilho, ondinha) */
+.page{position:relative;overflow:clip}
+.page>*:not(#fx){position:relative;z-index:1}
+#fx{position:sticky;top:0;display:block;width:100%;height:100vh;margin-bottom:-100vh;pointer-events:none;z-index:0}
+#fx2{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.sb-logo,.nav{position:relative;z-index:1}
+#fxc{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:300}
+.fx-off #fx,.fx-off #fx2,.fx-off #fxc{display:none}
+.kpi,.mot{position:relative;overflow:hidden;--mx:50%;--my:50%}
+.kpi::before,.mot::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(280px circle at var(--mx) var(--my),rgba(255,255,255,.65),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+:root[data-theme="dark"] .kpi::before,:root[data-theme="dark"] .mot::before{background:radial-gradient(280px circle at var(--mx) var(--my),rgba(255,255,255,.14),transparent 60%)}
+.kpi:hover::before,.mot:hover::before{opacity:1}
+.kpi>*,.mot>*{position:relative;z-index:1}
+.go,.add,.nv,.ab,.ga button{position:relative;overflow:hidden}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:ripple .65s ease-out;pointer-events:none}
+@keyframes ripple{to{transform:scale(3.2);opacity:0}}
+.banner{position:relative;overflow:hidden;border-radius:28px}
+.banner::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.38) 50%,transparent 62%);transform:translateX(-130%);animation:sweep 8s ease-in-out 2s infinite;pointer-events:none}
+@keyframes sweep{0%,55%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+#v_home,#v_rep{animation:viewin .5s var(--ease)}
+@keyframes viewin{from{opacity:0;transform:translateY(14px)}}
+.topbar{transition:box-shadow .3s}
+.topbar.sc{box-shadow:0 14px 30px -14px rgba(0,10,50,.7)}
+
+/* 12 · Responsivo e impressão */
 @media(max-width:1180px){.kpis{grid-template-columns:repeat(2,1fr)}.acts{grid-template-columns:1fr}.go{justify-content:center}}
 @media(max-width:900px){
+  #fx2{display:none}
   .app{grid-template-columns:1fr}
   .side{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:50;box-shadow:0 -10px 30px -10px rgba(0,10,50,.5)}
   .sb-logo,.sb-art{display:none}

@@ -53,6 +53,7 @@ $("t2").addEventListener("click",function(){var f=t2fn;$("toast").classList.remo
 function pid(n){return "p_"+Array.from(new TextEncoder().encode(n)).map(function(b){return b.toString(16).padStart(2,"0")}).join("")}
 function saveLocal(){LS.set(KEY,JSON.stringify(items.concat(bin)));LS.set(PK,JSON.stringify(people))}
 function loadLocal(){try{var all=JSON.parse(LS.get(KEY)||"[]");items=all.filter(function(x){return !x.deleted});bin=all.filter(function(x){return x.deleted})}catch(e){items=[];bin=[]}try{people=JSON.parse(LS.get(PK)||"{}")}catch(e){people={}}}
+function fxBurst(el){try{if(window.QMD)QMD.burst(el)}catch(e){}}
 function put(o){
   var old=items.find(function(x){return x.id===o.id})||bin.find(function(x){return x.id===o.id});
   if(old){o=Object.assign({},o);var lg=(old.log||[]).concat(logOf(old,o)).slice(-40);if(lg.length)o.log=lg;else delete o.log}
@@ -243,7 +244,7 @@ $("kf").addEventListener("submit",function(e){
     put(i.checked?Object.assign({},it,{paid:true,got:it.amount,paidAt:today()}):Object.assign({},it,{paid:false,got:0,paidAt:""}));
   });
   closeDlg($("kd"));
-  if(prev.length){snd("ok");toast(prev.length+" parcela(s) atualizada(s).",function(){prev.forEach(function(x){put(x)})})}
+  if(prev.length){snd("ok");if(prev.some(function(x){return !x.paid}))fxBurst();toast(prev.length+" parcela(s) atualizada(s).",function(){prev.forEach(function(x){put(x)})})}
 });
 
 /* ---------- extrato ---------- */
@@ -464,7 +465,7 @@ $("list").addEventListener("click",function(e){
     if(!prev.length){toast("Nada pendente para "+w+".");return}
     if(!confirm("Marcar "+prev.length+" item(ns) de "+w+" como pagos?"))return;
     prev.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today()}))});
-    snd("ok");toast(prev.length+" item(ns) quitados.",function(){prev.forEach(put)});return;
+    snd("ok");fxBurst(b);toast(prev.length+" item(ns) quitados.",function(){prev.forEach(put)});return;
   }
   if(D.a){attach(D.a);return}
   if(D.v){var pi=items.find(function(x){return x.id===D.v});if(pi){viewId=D.v;$("v_img").src=pi.proof;snd("tap");$("vd").showModal()}return}
@@ -473,7 +474,7 @@ $("list").addEventListener("click",function(e){
   if(D.t){
     var old=it;
     put(it.paid?Object.assign({},it,{paid:false,got:0,paidAt:""}):Object.assign({},it,{paid:true,got:it.amount,paidAt:today()}));
-    snd(old.paid?"tap":"ok");if(!old.paid)toast("Marcado como pago.",function(){put(old)},"Anexar comprovante",function(){attach(old.id)});
+    snd(old.paid?"tap":"ok");if(!old.paid)fxBurst(b);if(!old.paid)toast("Marcado como pago.",function(){put(old)},"Anexar comprovante",function(){attach(old.id)});
   }else if(D.d){
     put(Object.assign({},it,{deleted:Date.now()}));snd("del");toast("Item movido para a lixeira.",function(){put(it)});
   }else{
@@ -768,7 +769,7 @@ $("s_pay").addEventListener("click",function(){
   var p=selItems().filter(function(x){return !x.paid});
   if(!p.length){toast("Nenhuma pendente selecionada.");return}
   p.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today()}))});
-  snd("ok");toast(p.length+" dívida(s) pagas.",function(){p.forEach(function(x){put(x)})});selEnd();render();
+  snd("ok");fxBurst();toast(p.length+" dívida(s) pagas.",function(){p.forEach(function(x){put(x)})});selEnd();render();
 });
 $("s_del").addEventListener("click",function(){
   var p=selItems();if(!p.length){toast("Selecione alguma dívida.");return}
