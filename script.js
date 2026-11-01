@@ -43,7 +43,7 @@ $("th").addEventListener("change",function(){var v=$("th").value;if(v){root.data
 /* ---------- aviso com desfazer ---------- */
 var tt,undoFn=null,t2fn=null;
 function toast(msg,fn,l2,f2){
-  $("tm").textContent=msg;undoFn=fn||null;t2fn=f2||null;$("tu").hidden=!fn;$("t2").hidden=!f2;$("t2").textContent=l2||"";$("toast").classList.add("on");
+  $("tm").textContent=priv?String(msg).replace(/R\$\s?[\d.,]+/g,"R$ ••••"):msg;undoFn=fn||null;t2fn=f2||null;$("tu").hidden=!fn;$("t2").hidden=!f2;$("t2").textContent=l2||"";$("toast").classList.add("on");
   clearTimeout(tt);tt=setTimeout(function(){$("toast").classList.remove("on");undoFn=null;t2fn=null},f2?8000:6000);
 }
 $("tu").addEventListener("click",function(){if(undoFn){undoFn();snd("undo")}$("toast").classList.remove("on");undoFn=null});
@@ -148,6 +148,7 @@ function render(){
   });
   $("list").innerHTML=(view==="table"&&!selMode)?tableHTML(v):h||'<div class="empty">Nenhuma dívida encontrada. Adicione no formulário ou ajuste os filtros.</div>';
   if(v.length)first=false;
+  if($("kd").open&&kRef)openParcels(kRef);
   sel.forEach(function(i){if(!items.some(function(x){return x.id===i}))sel.delete(i)});
   dash(v,tp,tk);recv();renderBin();selN();expLbl();
 }
@@ -229,12 +230,36 @@ function sib(id){
   return r.length>1?r:[];
 }
 var kIds=[],sibs=[],kRef="";
-function openParcels(id){
-  var r=sib(id);if(!r.length)r=items.filter(function(x){return x.id===id});if(!r.length)return;kIds=r.map(function(x){return x.id});kRef=r[0].id;
-  $("k_t").textContent=r[0].who+" · marque as parcelas pagas";
-  $("k_l").innerHTML=r.map(function(x){return '<label class="pl"><input type="checkbox" data-k="'+x.id+'"'+(x.paid?" checked":"")+'><span>'+esc(x.desc)+' <small class="s">'+monthName(x.month)+'</small></span><b>'+brl(x.amount)+'</b></label>'}).join("");
-  $("kd").showModal();
+function openEdit(it){
+    var id=it.id;editId=id;sibs=sib(id);$("e_allw").hidden=!sibs.length;$("e_n").textContent=sibs.length;$("e_all").checked=true;
+    $("e_desc").value=it.desc;$("e_who").value=it.who;$("e_cat").value=it.cat||"";$("e_val").value=it.amount;$("e_got").value=got(it)||"";$("e_mon").value=it.date||it.month+"-01";$("e_note").value=it.note||"";
+    $("e_h").innerHTML=histHTML(it);
+    $("ed").showModal();
 }
+function openParcels(id){
+  var r=sib(id);if(!r.length)r=items.filter(function(x){return x.id===id});if(!r.length)return;
+  var keep={};if($("kd").open)document.querySelectorAll("#k_l input").forEach(function(i){keep[i.dataset.k]=i.checked});
+  kIds=r.map(function(x){return x.id});kRef=r[0].id;
+  $("k_t").textContent=r[0].who+" · marque as parcelas pagas, edite ou anexe o comprovante";
+  $("k_l").innerHTML=r.map(function(x){
+    var ck=keep[x.id]!==undefined?keep[x.id]:x.paid;
+    return '<div class="pl"><label class="plc"><input type="checkbox" data-k="'+x.id+'"'+(ck?" checked":"")+'><span>'+esc(x.desc)+' <small class="s">'+(x.date?fdate(x.date):monthName(x.month))+(x.paid&&x.paidAt?" · pago em "+fdate(x.paidAt):"")+'</small></span><b>'+brl(x.amount)+'</b></label>'+
+    '<button type="button" class="x" data-pe="'+x.id+'" title="Editar valor, data e nome">✎</button>'+
+    '<button type="button" class="x'+(x.proof?" on":"")+'" data-'+(x.proof?"pv":"pa")+'="'+x.id+'" title="'+(x.proof?"Ver comprovante":"Anexar comprovante")+'">'+(x.proof?"📎 Ver":"＋📎")+'</button></div>';
+  }).join("");
+  if(!$("kd").open)$("kd").showModal();
+}
+function kWho(){var it=items.find(function(x){return x.id===kRef});return it?it.who:""}
+$("k_l").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;var D=b.dataset;
+  if(D.pe){var it=items.find(function(x){return x.id===D.pe});if(it){closeDlg($("kd"));openEdit(it)}}
+  else if(D.pa){attach(D.pa)}
+  else if(D.pv){var pi=items.find(function(x){return x.id===D.pv});if(pi){viewId=D.pv;$("v_img").src=pi.proof;$("vd").showModal()}}
+});
+$("k_w").addEventListener("click",function(){cobrar(kWho())});
+$("k_x").addEventListener("click",function(){var w=kWho();closeDlg($("kd"));openStmt(w)});
+$("k_g").addEventListener("click",function(){var id=kRef;closeDlg($("kd"));openDebt(id)});
+$("k_p").addEventListener("click",function(){var w=kWho();closeDlg($("kd"));openPerson(w)});
 $("k_all").addEventListener("click",function(){document.querySelectorAll("#k_l input").forEach(function(i){i.checked=true})});
 $("kf").addEventListener("submit",function(e){
   e.preventDefault();var prev=[];
@@ -412,6 +437,16 @@ $("p_file").addEventListener("change",function(e){
     $("p_av").innerHTML='<img class="av" alt="" src="'+photo+'">';
   };img.src=u;$("p_file").value="";
 });
+$("p_w").addEventListener("click",function(){cobrar(editName)});
+$("p_x").addEventListener("click",function(){var w=editName;closeDlg($("pd"));openStmt(w)});
+$("p_r").addEventListener("click",function(){var w=editName;closeDlg($("pd"));openRecibo(w)});
+$("p_q").addEventListener("click",function(){
+  var w=editName,prev=items.filter(function(x){return x.who===w&&!x.paid});
+  if(!prev.length){toast("Nada pendente para "+w+".");return}
+  if(!confirm("Marcar "+prev.length+" item(ns) de "+w+" como pagos?"))return;
+  prev.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today()}))});
+  closeDlg($("pd"));snd("ok");fxBurst($("p_q"));toast(prev.length+" item(ns) quitados.",function(){prev.forEach(function(x){put(x)})});
+});
 $("pf").addEventListener("submit",function(e){
   e.preventDefault();
   var nn=$("p_name").value.trim(),old=editName;if(!nn)return;
@@ -478,10 +513,7 @@ $("list").addEventListener("click",function(e){
   }else if(D.d){
     put(Object.assign({},it,{deleted:Date.now()}));snd("del");toast("Item movido para a lixeira.",function(){put(it)});
   }else{
-    editId=id;sibs=sib(id);$("e_allw").hidden=!sibs.length;$("e_n").textContent=sibs.length;$("e_all").checked=true;
-    $("e_desc").value=it.desc;$("e_who").value=it.who;$("e_cat").value=it.cat||"";$("e_val").value=it.amount;$("e_got").value=got(it)||"";$("e_mon").value=it.date||it.month+"-01";$("e_note").value=it.note||"";
-    $("e_h").innerHTML=histHTML(it);
-    $("ed").showModal();
+    openEdit(it);
   }
 });
 $("ef").addEventListener("submit",function(e){
@@ -594,6 +626,21 @@ $("usr").addEventListener("click",function(){$("cfg").click()});
 $("rkb2").addEventListener("click",function(){$("rkb").click()});
 $("sair").addEventListener("click",function(){$("pin_l").click()});
 
+/* ---------- modo privacidade ---------- */
+var priv=LS.get("dv-priv")==="1";
+var EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+var EYE_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.9 10.9 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/><path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"/></svg>';
+function privApply(){
+  root.classList.toggle("priv",priv);
+  $("priv").innerHTML=priv?EYE_OFF:EYE;$("priv").classList.toggle("on",priv);
+  $("priv").title=priv?"Valores escondidos. Toque para mostrar":"Esconder valores (modo privacidade)";
+  $("privb").textContent=priv?"Ativado":"Desativado";
+}
+function privToggle(){priv=!priv;LS.set("dv-priv",priv?"1":"0");privApply();snd("tap");toast(priv?"Valores escondidos.":"Valores visíveis.")}
+$("priv").addEventListener("click",privToggle);
+$("privb").addEventListener("click",privToggle);
+privApply();
+
 /* ---------- recibo ---------- */
 var recCur=null;
 function recData(w,id){
@@ -705,6 +752,8 @@ function vwBtn(){$("vw").textContent=view==="table"?"☰ Cards":"▦ Tabela"}
 vwBtn();
 $("vw").addEventListener("click",function(){view=view==="table"?"cards":"table";LS.set("dv-view",view);vwBtn();snd("tap");render()});
 var IC_E='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+var IC_G='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
+var IC_W='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.2 7.5L3 21l2-5.5A8.4 8.4 0 1 1 21 11.5z"/></svg>';
 var IC_D='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
 function tableHTML(v){
   var seen={},gs=[],td=today();
@@ -726,7 +775,7 @@ function tableHTML(v){
     var late=o.nx&&(o.nx.date||o.nx.month+"-31")<td;
     var st=o.rs<=0?['st-ok','Quitado']:late?['st-late','Atrasado']:o.pd>0?['st-ok','Em dia']:['st-pe','Pendente'];
     var multi=o.n>1;
-    return '<tr class="gr" data-g="'+o.id+'" title="Ver parcelas" style="animation-delay:'+Math.min(i,10)*40+'ms"><td class="n">'+esc(o.who)+'</td><td>'+esc(o.desc)+'</td><td class="v">'+brl(o.tot)+'</td><td class="num">'+o.n+'x'+sub+'</td><td class="num">'+brl(o.pd)+'</td><td class="r'+(o.rs<=0?" z":"")+'">'+brl(o.rs)+'</td><td class="num">'+due+'</td><td><span class="st '+st[0]+'">'+st[1]+'</span></td><td class="ac"><button class="ab ab-e" '+(multi?'data-gd':'data-e')+'="'+o.id+'" title="Editar" aria-label="Editar">'+IC_E+'</button><button class="ab ab-d" '+(multi?'data-dd':'data-d')+'="'+o.id+'" title="Apagar" aria-label="Apagar">'+IC_D+'</button></td></tr>';
+    return '<tr class="gr" data-g="'+o.id+'" title="Ver parcelas" style="animation-delay:'+Math.min(i,10)*40+'ms"><td class="n">'+av(o.who)+esc(o.who)+'</td><td>'+esc(o.desc)+'</td><td class="v">'+brl(o.tot)+'</td><td class="num">'+o.n+'x'+sub+'</td><td class="num">'+brl(o.pd)+'</td><td class="r'+(o.rs<=0?" z":"")+'">'+brl(o.rs)+'</td><td class="num">'+due+'</td><td><span class="st '+st[0]+'">'+st[1]+'</span></td><td class="ac"><button class="ab ab-g" data-r="'+encodeURIComponent(o.who)+'" title="Pessoa: total, foto, telefone, extrato e recibo" aria-label="Configurações da pessoa">'+IC_G+'</button><button class="ab ab-w" data-w="'+encodeURIComponent(o.who)+'" title="Cobrar no WhatsApp" aria-label="Cobrar no WhatsApp">'+IC_W+'</button><button class="ab ab-e" '+(multi?'data-gd':'data-e')+'="'+o.id+'" title="Editar" aria-label="Editar">'+IC_E+'</button><button class="ab ab-d" '+(multi?'data-dd':'data-d')+'="'+o.id+'" title="Apagar" aria-label="Apagar">'+IC_D+'</button></td></tr>';
   }).join("");
   return '<div class="tw"><table><thead><tr><th>Nome</th><th>Descrição</th><th>Valor Total</th><th>Parcelas</th><th>Já Pago</th><th>Restante</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td colspan="2">Total · '+gs.length+' dívida(s)</td><td>'+brl(T)+'</td><td></td><td>'+brl(P)+'</td><td>'+brl(R)+'</td><td colspan="3"></td></tr></tfoot></table></div>';
 }

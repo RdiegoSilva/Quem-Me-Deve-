@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
 <div class="app">
@@ -34,7 +34,7 @@
 <div class="mainc">
 <header class="topbar">
 <span class="tdate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg><span id="hello"></span></span>
-<div class="tact"><button class="tb-i" id="rkb" title="Ranking de pagadores" aria-label="Ranking">🏆</button><button class="tb-i" id="tb" title="Lixeira" aria-label="Lixeira">🗑 <span class="bn" id="bn" hidden>0</span></button><span class="tsep"></span><button class="avatar" id="usr" title="Configurações" aria-label="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button></div>
+<div class="tact"><button class="tb-i" id="priv" title="Modo privacidade: esconder valores" aria-label="Modo privacidade"></button><button class="tb-i" id="rkb" title="Ranking de pagadores" aria-label="Ranking">🏆</button><button class="tb-i" id="tb" title="Lixeira" aria-label="Lixeira">🗑 <span class="bn" id="bn" hidden>0</span></button><span class="tsep"></span><button class="avatar" id="usr" title="Configurações" aria-label="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button></div>
 </header>
 
 <main class="page">
@@ -108,6 +108,7 @@
 <div class="full pr"><span id="p_av"></span><div><button class="sec" type="button" id="p_pick">Escolher foto</button> <button class="sec" type="button" id="p_rm">Remover</button></div><input id="p_file" type="file" accept="image/*" hidden></div>
 <div class="full"><label for="p_name">Nome</label><input id="p_name" required></div>
 <div class="full"><label for="p_phone">WhatsApp (com DDD)</label><input id="p_phone" type="tel" inputmode="tel" placeholder="Ex.: 85 99999-9999"></div>
+<div class="full ktools"><button class="sec" type="button" id="p_w">💬 Cobrar</button><button class="sec" type="button" id="p_x">📄 Extrato</button><button class="sec" type="button" id="p_r">🧾 Recibo</button><button class="sec" type="button" id="p_q">✔ Quitar tudo</button></div>
 <button class="sec" type="button" data-close="pd">Cancelar</button><button class="add" type="submit">Salvar</button>
 </form></dialog>
 
@@ -115,7 +116,7 @@
 <h2 class="full">Parcelas</h2>
 <p class="s full" id="k_t"></p>
 <div class="full" id="k_l"></div>
-<button class="sec full" type="button" id="k_rc">🧾 Recibo desta dívida</button>
+<div class="full ktools"><button class="sec" type="button" id="k_w">💬 Cobrar</button><button class="sec" type="button" id="k_x">📄 Extrato</button><button class="sec" type="button" id="k_rc">🧾 Recibo</button><button class="sec" type="button" id="k_g">⚙ Dívida</button><button class="sec" type="button" id="k_p">👤 Pessoa</button></div>
 <button class="sec full" type="button" id="k_all">Marcar todas como pagas</button>
 <button class="sec" type="button" data-close="kd">Cancelar</button><button class="add" type="submit">Salvar</button>
 </form></dialog>
@@ -156,6 +157,7 @@
 <h2>⚙ Configurações</h2>
 <div class="cg"><h3>Som e aparência</h3>
 <div class="cr"><span>Sons do site</span><button class="sec" id="snd">Ligado</button></div>
+<div class="cr"><span>Modo privacidade (esconder valores)</span><button class="sec" id="privb">Desativado</button></div>
 <div class="cr"><span>Efeitos e partículas</span><button class="sec" id="fxb">Ligado</button></div>
 <div class="cr"><span>Tema</span><select id="th"><option value="">Claro</option><option value="dark">Escuro</option></select></div></div>
 <div class="cg"><h3>Segurança</h3>
@@ -208,7 +210,7 @@
 
 <div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
 <canvas id="fxc" aria-hidden="true"></canvas>
-<script src="script.js?v=13"></script>
-<script src="efeitos.js?v=13"></script>
+<script src="script.js?v=15"></script>
+<script src="efeitos.js?v=15"></script>
 </body>
 </html>

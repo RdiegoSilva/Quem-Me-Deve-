@@ -3,7 +3,7 @@
    01 Tokens · 02 Base · 03 Botões e campos · 04 Estrutura (menu e topo)
    05 Início (banner, resumo, ações) · 06 Minhas Dívidas (painel e tabela)
    07 Cards por pessoa · 08 Relatórios · 09 Janelas · 10 Avisos e PIN
-   11 Efeitos · 12 Responsivo e impressão
+   11 Efeitos · 12 Privacidade · 13 Responsivo e impressão
    ========================================================== */
 
 /* 01 · Tokens */
@@ -126,7 +126,7 @@ svg{width:1.2em;height:1.2em;flex:none}
 #list:has(.tw){padding:0}
 #list:not(:has(.tw)){padding:18px;display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
 .tw{overflow-x:auto}
-.tw table{width:100%;min-width:900px;border-collapse:collapse;font-size:15px}
+.tw table{width:100%;min-width:1040px;border-collapse:collapse;font-size:15px}
 .tw th{background:color-mix(in srgb,var(--pr) 9%,var(--card));color:var(--navy);font-size:15px;font-weight:700;padding:15px 12px;text-align:center;white-space:nowrap}
 .tw td{padding:14px 12px;text-align:center;border-bottom:1.5px solid var(--bd);vertical-align:middle}
 .tw td.n,.tw th:first-child{text-align:left;padding-left:20px}
@@ -148,6 +148,9 @@ svg{width:1.2em;height:1.2em;flex:none}
 .ab svg{width:18px;height:18px}
 .ab-e{background:linear-gradient(180deg,#2f8bff,#1a63e6)}
 .ab-d{background:linear-gradient(180deg,#f25555,#d92d2d)}
+.ab-g{background:linear-gradient(180deg,#5f78b8,#3f5594)}
+.ab-w{background:linear-gradient(180deg,#34c759,#16a34a)}
+.tw td.n .av{width:30px;height:30px;font-size:12px;display:inline-grid;vertical-align:middle;margin-right:10px}
 .ab:hover{filter:brightness(1.1);transform:translateY(-2px)}
 .empty{grid-column:1/-1;text-align:center;color:var(--mu);padding:48px 16px}
 .empty::before{content:"🧾";display:block;font-size:44px;margin-bottom:8px}
@@ -259,9 +262,14 @@ dialog #f{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .psum .t input{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.4);color:#fff;font-size:28px;font-weight:800;height:58px;margin-top:6px}
 .psum .t input:focus{background:rgba(255,255,255,.28);border-color:#fff}
 .ck{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--tx);margin:0}
-.pl{display:flex;gap:12px;align-items:center;padding:12px 14px;border:1.5px solid var(--bd);border-radius:16px;margin:0 0 8px;font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--tx);cursor:pointer}
+.pl{display:flex;gap:4px;align-items:center;padding:6px 8px 6px 14px;border:1.5px solid var(--bd);border-radius:16px;margin:0 0 8px;font-size:14px}
 .pl:hover{border-color:var(--pr)}
-.pl span{flex:1}.pl b{white-space:nowrap}
+.plc{display:flex;gap:12px;align-items:center;flex:1;min-width:0;margin:0;padding:6px 0;font-size:14px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--tx);cursor:pointer}
+.plc span{flex:1}.plc b{white-space:nowrap}
+.pl .x{padding:6px 8px;font-size:14px;white-space:nowrap}
+.pl .x.on{color:var(--pr);font-weight:700}
+.ktools{display:flex;flex-wrap:wrap;gap:8px}
+.ktools button{padding:9px 14px;font-size:13px}
 .xh{font-size:24px;font-weight:800}
 .xs{margin:18px 0 4px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
 .xr{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1.5px dashed var(--bd);font-size:14px}
@@ -351,7 +359,14 @@ dialog#recd{width:min(580px,94vw)}
 .topbar{transition:box-shadow .3s}
 .topbar.sc{box-shadow:0 14px 30px -14px rgba(0,10,50,.7)}
 
-/* 12 · Responsivo e impressão */
+/* 12 · Modo privacidade (esconde os valores em reais) */
+.tb-i svg{width:20px;height:20px}
+.tb-i.on{background:#ffc400;color:#0c1c4a}
+.priv :is(#tt,#tk,#tp,.tw td.v,.tw td.r,.tw tbody td:nth-child(5),.tw tfoot td+td,.gp,.dt .s,.it .v,.psum b,.psum input,.br span:last-child,.cv,#rtot,.rk-row .mm .s,.pl b,#t_l .xr b,.pv){filter:blur(7px);user-select:none;pointer-events:none}
+.priv .tw tfoot td+td{filter:blur(7px)}
+.priv .psum input{pointer-events:auto}
+
+/* 13 · Responsivo e impressão */
 @media(max-width:1180px){.kpis{grid-template-columns:repeat(2,1fr)}.acts{grid-template-columns:1fr}.go{justify-content:center}}
 @media(max-width:900px){
   #fx2{display:none}
@@ -381,6 +396,7 @@ dialog#recd{width:min(580px,94vw)}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 @media print{
+  .priv *{filter:none!important}
   body>*:not(#recd){display:none!important}
   dialog#recd{display:block!important;position:static!important;width:100%!important;max-height:none!important;box-shadow:none!important;border:0!important;background:#fff!important;color:#111!important;--tx:#111;--mu:#555;--bd:#cfcfcf;--card:#fff;--bg:#f4f6fb}
   dialog#recd::backdrop{display:none}
