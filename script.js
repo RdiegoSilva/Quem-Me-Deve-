@@ -110,7 +110,7 @@ function render(){
     return !q||(x.desc+" "+x.who+" "+(x.cat||"")+" "+(x.note||"")+" "+monthName(x.month)).toLowerCase().indexOf(q)>=0;
   });
   var tp=0,tk=0;v.forEach(function(x){tp+=rem(x);tk+=got(x)});
-  var cp=0,ck=0;v.forEach(function(x){if(rem(x)>0)cp++;if(got(x)>0)ck++});$("kpn").textContent=cp+" em aberto";$("kkn").textContent=ck+" com pagamento";$("ktn").textContent=v.length+" dívidas";$("cnt").textContent=v.length+" de "+items.length;
+  var cp=0,ck=0;v.forEach(function(x){if(rem(x)>0)cp++;if(got(x)>0)ck++});$("kpn").textContent=cp+" em aberto";$("kpp").textContent=cp;$("kkn").textContent=ck+" com pagamento";$("ktn").textContent=v.length+" dívidas";$("cnt").textContent=v.length+" de "+items.length;
   $("h_p").textContent=new Set(items.map(function(x){return x.who})).size;$("h_n").textContent=items.filter(function(x){return rem(x)>0}).length;$("h_k").textContent=items.filter(function(x){return x.paid}).length;
   num($("tp"),tp);num($("tk"),tk);num($("tt"),tp+tk);
   var g={};v.forEach(function(x){(g[x.who]=g[x.who]||[]).push(x)});
@@ -118,7 +118,7 @@ function render(){
   Object.keys(g).sort().forEach(function(w){
     var pend=0,gT=0,gG=0;g[w].forEach(function(x){pend+=rem(x);gT+=x.amount;gG+=got(x)});var pc=gT?Math.round(gG/gT*100):0;
     var ew=encodeURIComponent(w);
-    h+='<div class="group"><div class="gh">'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button><span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-x="'+ew+'">Extrato</button><button data-rb="'+ew+'">Recibo</button><button data-q="'+ew+'">Quitar tudo</button></div></div><div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
+    h+='<div class="group'+(shutP[w]?" shut":"")+'"><div class="gh"><button class="tgl pt" data-gp="'+ew+'" aria-label="Abrir ou fechar" title="Abrir ou fechar"><span class="chev">▾</span></button>'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button><span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-x="'+ew+'">Extrato</button><button data-rb="'+ew+'">Recibo</button><button data-q="'+ew+'">Quitar tudo</button></div></div><div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
     var gk={},ord=[];
     g[w].forEach(function(x){
       var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;
@@ -130,14 +130,16 @@ function render(){
     ord.forEach(function(G){
       var multi=G.all.length>1,np=0,dT=0,dP=0,dR=0;
       G.all.forEach(function(y){if(y.paid)np++;dT+=y.amount;dP+=got(y);dR+=rem(y)});
-      h+='<div class="debt'+(multi?"":" one")+'">';
-      if(multi){var dp=dT?Math.round(dP/dT*100):0;
-        h+='<div class="dh"><div class="dt"><b>'+esc(G.all[0].desc.replace(/\s*\d+\/\d+$/,""))+'</b><span class="s">'+np+' de '+G.all.length+' parcelas pagas · falta '+brl(dR)+'</span></div><div class="dbtn"><button class="pcs" data-k="'+G.all[0].id+'">Parcelas</button><button class="pcs" data-rc="'+G.all[0].id+'">Recibo</button></div></div><div class="pb" title="'+dp+'% pago"><i style="width:'+dp+'%"></i></div>';
+      var dkey=multi?G.all[0].id.slice(0,G.all[0].id.lastIndexOf("_")+1):"",isOpen=selMode||!!$("q").value.trim()||!!openD[dkey];
+      h+='<div class="debt'+(multi?(isOpen?" open":""):" one")+'"'+(multi?' data-dk="'+dkey+'"':"")+'>';
+      if(multi){
+        var dp=dT?Math.round(dP/dT*100):0,nx=G.all.filter(function(y){return rem(y)>0})[0];
+        h+='<div class="dh"><button class="dt tgl" data-o="'+dkey+'" title="Abrir ou fechar as parcelas"><span class="chev">▾</span><span><b>'+esc(G.all[0].desc.replace(/\s*\d+\/\d+$/,""))+'</b><span class="s">'+np+' de '+G.all.length+' pagas · falta '+brl(dR)+(nx?' · próxima '+(nx.date?fdate(nx.date):monthName(nx.month)):' · quitada ✓')+'</span></span></button><div class="dbtn"><button class="pcs" data-k="'+G.all[0].id+'">Parcelas</button><button class="pcs" data-rc="'+G.all[0].id+'">Recibo</button><button class="gear" data-gd="'+G.all[0].id+'" title="Editar nome da dívida" aria-label="Editar dívida">⚙</button></div></div><div class="pb" title="'+dp+'% pago"><i style="width:'+dp+'%"></i></div>';
       }
       G.rows.sort(function(a,b){return (a.paid?1:0)-(b.paid?1:0)||((a.date||a.month)<(b.date||b.month)?-1:1)}).forEach(function(x){
       var gt=got(x),part=!x.paid&&gt>0,sub=[x.date?fdate(x.date):monthName(x.month)];
       var meta=(x.cat?'<span class="c">'+esc(x.cat)+'</span>':"")+sub[0]+(x.note?" · "+esc(x.note):"")+(x.paid&&x.paidAt?" · pago em "+ddmm(x.paidAt):"");
-      h+='<div class="it'+(x.paid?" paid":"")+(sel.has(x.id)?" sel":"")+cls+'" style="animation-delay:'+Math.min(n++,12)*45+'ms">'+(selMode?'<input type="checkbox" class="sk" data-s="'+x.id+'"'+(sel.has(x.id)?" checked":"")+' aria-label="Selecionar">':"")+'<div class="m"><div class="d">'+esc(x.desc)+'</div><div class="s">'+meta+'</div>'+(part?'<div class="pb"><i style="width:'+Math.round(gt/x.amount*100)+'%"></i></div>':"")+'</div><div class="v">'+brl(x.amount)+(part?'<small>falta '+brl(rem(x))+'</small>':"")+'</div><button class="tg '+(x.paid?"o":"p")+'" data-t="'+x.id+'">'+(x.paid?"Pago":"Pendente")+'</button>'+(x.proof?'<button class="pcs" data-v="'+x.id+'">📎 Comprovante</button>':x.paid?'<button class="pcs" data-a="'+x.id+'">+ Comprovante</button>':"")+'<button class="x" data-e="'+x.id+'" title="Editar">✎</button><button class="x" data-d="'+x.id+'" title="Apagar">✕</button></div>';
+      h+='<div class="it'+(x.paid?" paid":"")+(sel.has(x.id)?" sel":"")+cls+'" style="animation-delay:'+Math.min(n++,12)*45+'ms">'+(selMode?'<input type="checkbox" class="sk" data-s="'+x.id+'"'+(sel.has(x.id)?" checked":"")+' aria-label="Selecionar">':"")+'<div class="m"><div class="d">'+esc(x.desc)+'</div><div class="s">'+meta+'</div>'+(part?'<div class="pb"><i style="width:'+Math.round(gt/x.amount*100)+'%"></i></div>':"")+'</div><div class="v">'+brl(x.amount)+(part?'<small>falta '+brl(rem(x))+'</small>':"")+'</div><button class="tg '+(x.paid?"o":"p")+'" data-t="'+x.id+'">'+(x.paid?"Pago":"Pendente")+'</button>'+(x.proof?'<button class="pcs" data-v="'+x.id+'">📎 Comprovante</button>':x.paid?'<button class="pcs" data-a="'+x.id+'">+ Comprovante</button>':"")+(multi?"":'<button class="x" data-gd="'+x.id+'" title="Editar nome da dívida">⚙</button>')+'<button class="x" data-e="'+x.id+'" title="Editar">✎</button><button class="x" data-d="'+x.id+'" title="Apagar">✕</button></div>';
       });
       h+='</div>';
     });
@@ -146,7 +148,7 @@ function render(){
   $("list").innerHTML=(view==="table"&&!selMode)?tableHTML(v):h||'<div class="empty">Nenhuma dívida encontrada. Adicione no formulário ou ajuste os filtros.</div>';
   if(v.length)first=false;
   sel.forEach(function(i){if(!items.some(function(x){return x.id===i}))sel.delete(i)});
-  dash(v,tp,tk);recv();renderBin();selN();
+  dash(v,tp,tk);recv();renderBin();selN();expLbl();
 }
 
 function addM(ym,i){var p=ym.split("-"),d=new Date(+p[0],+p[1]-1+i,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
@@ -336,7 +338,10 @@ $("r_file").addEventListener("change",function(e){
   img.onload=function(){var c=document.createElement("canvas");c.width=c.height=96;var q=Math.min(img.width,img.height);c.getContext("2d").drawImage(img,(img.width-q)/2,(img.height-q)/2,q,q,0,0,96,96);rphoto=c.toDataURL("image/jpeg",.8);URL.revokeObjectURL(u);updR()};
   img.src=u;$("r_file").value="";
 });
-$("hello").textContent=(function(){var d=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"});return d.charAt(0).toUpperCase()+d.slice(1)+" · quem deve, quanto falta e o que já foi pago"})();
+$("hello").textContent=(function(){
+  var d=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  return d.replace(/(^|\s)(\p{L})/gu,function(m,x,y){return x+y.toUpperCase()}).replace(/ De /g," de ");
+})();
 
 /* ---------- comprovante ---------- */
 var attachId=null,viewId=null;
@@ -375,7 +380,7 @@ $("v_rm").addEventListener("click",function(){
 var editId=null,editName=null,photo="";
 function closeDlg(d){if(d.open)d.close()}
 document.querySelectorAll("[data-close]").forEach(function(b){b.addEventListener("click",function(){closeDlg($(b.dataset.close))})});
-["ed","pd","kd","xd","vd","td","rd","cd","rk","im","sd","recd"].forEach(function(i){$(i).addEventListener("click",function(e){if(e.target===$(i))closeDlg($(i))})});
+["ed","pd","kd","xd","vd","td","rd","cd","rk","im","sd","recd","dg"].forEach(function(i){$(i).addEventListener("click",function(e){if(e.target===$(i))closeDlg($(i))})});
 
 function cobrar(w){
   var p=items.filter(function(x){return x.who===w&&rem(x)>0});
@@ -432,7 +437,13 @@ $("pf").addEventListener("submit",function(e){
 });
 
 $("list").addEventListener("click",function(e){
-  var tr=e.target.closest("tr.gr");if(tr){snd("tap");openParcels(tr.dataset.g);return}
+  var tg=e.target.closest("[data-o],[data-gp]");
+  if(tg){
+    if(tg.dataset.o){var d=tg.closest(".debt"),on=d.classList.toggle("open");if(on)openD[tg.dataset.o]=1;else delete openD[tg.dataset.o];LS.set("dv-open",JSON.stringify(openD))}
+    else{var pw=decodeURIComponent(tg.dataset.gp),sh=tg.closest(".group").classList.toggle("shut");if(sh)shutP[pw]=1;else delete shutP[pw];LS.set("dv-shut",JSON.stringify(shutP))}
+    snd("tap");expLbl();return;
+  }
+  var tr=e.target.closest("tr.gr");if(tr&&!e.target.closest("button")){snd("tap");openParcels(tr.dataset.g);return}
   if(e.target.classList&&e.target.classList.contains("sk")){
     var sid=e.target.dataset.s;if(e.target.checked)sel.add(sid);else sel.delete(sid);
     e.target.closest(".it").classList.toggle("sel",e.target.checked);selN();return;
@@ -440,6 +451,8 @@ $("list").addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;
   var D=b.dataset;
   if(D.w){cobrar(decodeURIComponent(D.w));return}
+  if(D.gd){snd("tap");openDebt(D.gd);return}
+  if(D.dd){var gr=sib(D.dd);if(!gr.length)return;gr.forEach(function(x){put(Object.assign({},x,{deleted:Date.now()}))});snd("del");toast("Dívida movida para a lixeira.",function(){gr.forEach(function(x){put(x)})});return}
   if(D.rb){snd("tap");openRecibo(decodeURIComponent(D.rb));return}
   if(D.rc){var ri=items.find(function(x){return x.id===D.rc});if(ri){snd("tap");openRecibo(ri.who,D.rc)}return}
   if(D.x){snd("tap");openStmt(decodeURIComponent(D.x));return}
@@ -523,6 +536,62 @@ $("inst").addEventListener("click",function(){
 });
 window.addEventListener("appinstalled",function(){toast("App instalado!")});
 if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register("sw.js").catch(function(){})}
+
+/* ---------- abrir/fechar e editar dívida ---------- */
+var openD={},shutP={};
+try{openD=JSON.parse(LS.get("dv-open")||"{}");shutP=JSON.parse(LS.get("dv-shut")||"{}")}catch(e){}
+function expLbl(){
+  var ds=document.querySelectorAll("#list .debt:not(.one)");
+  var anyClosed=Array.prototype.some.call(ds,function(d){return !d.classList.contains("open")})||!!document.querySelector("#list .group.shut");
+  $("expb").textContent=anyClosed?"⇣ Abrir tudo":"⇡ Fechar tudo";$("expb").hidden=!ds.length;
+}
+$("expb").addEventListener("click",function(){
+  var ds=document.querySelectorAll("#list .debt:not(.one)"),anyClosed=Array.prototype.some.call(ds,function(d){return !d.classList.contains("open")})||!!document.querySelector("#list .group.shut");
+  ds.forEach(function(d){d.classList.toggle("open",anyClosed);if(anyClosed)openD[d.dataset.dk]=1;else delete openD[d.dataset.dk]});
+  if(anyClosed){document.querySelectorAll("#list .group.shut").forEach(function(g){g.classList.remove("shut")});shutP={}}
+  LS.set("dv-open",JSON.stringify(openD));LS.set("dv-shut",JSON.stringify(shutP));snd("tap");expLbl();
+});
+var dgIds=[];
+function openDebt(id){
+  var r=sib(id);if(!r.length)r=items.filter(function(x){return x.id===id});if(!r.length)return;
+  dgIds=r.map(function(x){return x.id});var multi=r.length>1;
+  $("dg_t").textContent=multi?r.length+" parcelas. O novo nome vale para todas elas.":"Dívida de uma parcela.";
+  $("dg_n").value=multi?r[0].desc.replace(/\s*\d+\/\d+$/,""):r[0].desc;
+  $("dg_w").value=r[0].who;$("dg_c").value=(r.filter(function(x){return x.cat})[0]||{}).cat||"";
+  $("dg").showModal();
+}
+$("dgf").addEventListener("submit",function(e){
+  e.preventDefault();
+  var base=$("dg_n").value.trim(),w=$("dg_w").value.trim(),c=$("dg_c").value.trim();if(!base||!w)return;
+  var r=items.filter(function(x){return dgIds.indexOf(x.id)>=0}),multi=r.length>1;
+  r.forEach(function(x){var m=x.desc.match(/\s*(\d+\/\d+)$/);put(Object.assign({},x,{desc:multi?base+(m?" "+m[1]:""):base,who:w,cat:c}))});
+  closeDlg($("dg"));snd("ok");toast("Dívida atualizada.",function(){r.forEach(function(x){put(x)})});
+});
+$("dg_x").addEventListener("click",function(){
+  var r=items.filter(function(x){return dgIds.indexOf(x.id)>=0});if(!r.length)return;
+  if(!confirm("Apagar a dívida inteira ("+r.length+" parcela(s))? Ela vai para a lixeira."))return;
+  r.forEach(function(x){put(Object.assign({},x,{deleted:Date.now()}))});
+  closeDlg($("dg"));snd("del");toast("Dívida na lixeira.",function(){r.forEach(function(x){put(x)})});
+});
+
+/* ---------- menu lateral ---------- */
+function showV(v){
+  $("v_home").hidden=v!=="home";$("v_rep").hidden=v!=="rep";
+  document.querySelectorAll(".nv[data-nv]").forEach(function(b){b.classList.toggle("on",b.dataset.nv===v||(v==="home"&&b.dataset.nv==="home"))});
+}
+document.querySelectorAll(".nv[data-nv]").forEach(function(b){
+  b.addEventListener("click",function(){
+    var d=b.dataset.nv;snd("tap");
+    if(d==="nova"){$("rg").click();return}
+    if(d==="rel"){showV("rep");render();window.scrollTo({top:0});return}
+    showV("home");
+    document.querySelectorAll(".nv[data-nv]").forEach(function(x){x.classList.toggle("on",x===b)});
+    if(d==="minhas")$("minhas").scrollIntoView({behavior:calm?"auto":"smooth",block:"start"});else window.scrollTo({top:0,behavior:calm?"auto":"smooth"});
+  });
+});
+$("usr").addEventListener("click",function(){$("cfg").click()});
+$("rkb2").addEventListener("click",function(){$("rkb").click()});
+$("sair").addEventListener("click",function(){$("pin_l").click()});
 
 /* ---------- recibo ---------- */
 var recCur=null;
@@ -630,12 +699,14 @@ $("rc_i").addEventListener("click",function(){
 });
 
 /* ---------- visão em tabela ---------- */
-var view=LS.get("dv-view")==="table"?"table":"cards";
+var view=LS.get("dv-view")==="cards"?"cards":"table";
 function vwBtn(){$("vw").textContent=view==="table"?"☰ Cards":"▦ Tabela"}
 vwBtn();
 $("vw").addEventListener("click",function(){view=view==="table"?"cards":"table";LS.set("dv-view",view);vwBtn();snd("tap");render()});
+var IC_E='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+var IC_D='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>';
 function tableHTML(v){
-  var seen={},gs=[];
+  var seen={},gs=[],td=today();
   v.forEach(function(x){
     var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;
     if(seen[k])return;seen[k]=1;
@@ -644,16 +715,19 @@ function tableHTML(v){
     o.key=o.nx?(o.nx.date||o.nx.month+"-01"):"9999";
     gs.push(o);
   });
-  if(!gs.length)return '<div class="empty">Nenhuma dívida encontrada. Adicione no botão Registrar ou ajuste os filtros.</div>';
+  if(!gs.length)return '<div class="empty">Nenhuma dívida encontrada. Use o botão verde para adicionar ou ajuste os filtros.</div>';
   gs.sort(function(a,b){return a.who.localeCompare(b.who)||(a.key<b.key?-1:a.key>b.key?1:0)});
   var T=0,P=0,R=0;
-  var rows=gs.map(function(o){
+  var rows=gs.map(function(o,i){
     T+=o.tot;P+=o.pd;R+=o.rs;
     var due=o.nx?(o.nx.date?fdate(o.nx.date):monthName(o.nx.month)):'<span class="q">Quitado</span>';
     var sub=o.n>1?'<small>'+o.np+(o.np===1?" paga":" pagas")+'</small>':(o.np?'<small>paga</small>':"");
-    return '<tr class="gr" data-g="'+o.id+'" title="Ver parcelas"><td class="n">'+av(o.who)+esc(o.who)+'</td><td>'+esc(o.desc)+'</td><td class="v">'+brl(o.tot)+'</td><td class="num">'+o.n+'x'+sub+'</td><td class="num">'+brl(o.pd)+'</td><td class="r'+(o.rs<=0?" z":"")+'">'+brl(o.rs)+'</td><td class="num">'+due+'</td></tr>';
+    var late=o.nx&&(o.nx.date||o.nx.month+"-31")<td;
+    var st=o.rs<=0?['st-ok','Quitado']:late?['st-late','Atrasado']:o.pd>0?['st-ok','Em dia']:['st-pe','Pendente'];
+    var multi=o.n>1;
+    return '<tr class="gr" data-g="'+o.id+'" title="Ver parcelas" style="animation-delay:'+Math.min(i,10)*40+'ms"><td class="n">'+esc(o.who)+'</td><td>'+esc(o.desc)+'</td><td class="v">'+brl(o.tot)+'</td><td class="num">'+o.n+'x'+sub+'</td><td class="num">'+brl(o.pd)+'</td><td class="r'+(o.rs<=0?" z":"")+'">'+brl(o.rs)+'</td><td class="num">'+due+'</td><td><span class="st '+st[0]+'">'+st[1]+'</span></td><td class="ac"><button class="ab ab-e" '+(multi?'data-gd':'data-e')+'="'+o.id+'" title="Editar" aria-label="Editar">'+IC_E+'</button><button class="ab ab-d" '+(multi?'data-dd':'data-d')+'="'+o.id+'" title="Apagar" aria-label="Apagar">'+IC_D+'</button></td></tr>';
   }).join("");
-  return '<div class="tw"><table><thead><tr><th>Nome</th><th>Descrição</th><th>Valor total</th><th>Parcelas</th><th>Já pago</th><th>Restante</th><th>Vencimento</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td colspan="2">Total · '+gs.length+' dívida(s)</td><td>'+brl(T)+'</td><td></td><td>'+brl(P)+'</td><td>'+brl(R)+'</td><td></td></tr></tfoot></table></div>';
+  return '<div class="tw"><table><thead><tr><th>Nome</th><th>Descrição</th><th>Valor Total</th><th>Parcelas</th><th>Já Pago</th><th>Restante</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td colspan="2">Total · '+gs.length+' dívida(s)</td><td>'+brl(T)+'</td><td></td><td>'+brl(P)+'</td><td>'+brl(R)+'</td><td colspan="3"></td></tr></tfoot></table></div>';
 }
 
 /* ---------- histórico de mudanças ---------- */
