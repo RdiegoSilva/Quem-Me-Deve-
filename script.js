@@ -8,7 +8,6 @@ var calm=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matche
 var pad=function(n){return String(n).padStart(2,"0")};
 var today=function(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())};
 var LS={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-$("mon").value=today();
 try{if(LS.get("dv-pin-on")==="0"||sessionStorage.getItem("dv-ok")==="1")$("lock").hidden=true}catch(e){}
 
 /* ---------- valores ---------- */
@@ -119,7 +118,7 @@ function render(){
   Object.keys(g).sort().forEach(function(w){
     var pend=0,gT=0,gG=0;g[w].forEach(function(x){pend+=rem(x);gT+=x.amount;gG+=got(x)});var pc=gT?Math.round(gG/gT*100):0;
     var ew=encodeURIComponent(w);
-    h+='<div class="group'+(shutP[w]?" shut":"")+'"><div class="gh"><button class="tgl pt" data-gp="'+ew+'" aria-label="Abrir ou fechar" title="Abrir ou fechar"><span class="chev">▾</span></button>'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button><span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-x="'+ew+'">Extrato</button><button data-rb="'+ew+'">Recibo</button><button data-q="'+ew+'">Quitar tudo</button></div></div><div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
+    h+='<div class="group'+(shutP[w]?" shut":"")+'"><div class="gh"><button class="tgl pt" data-gp="'+ew+'" aria-label="Abrir ou fechar" title="Abrir ou fechar"><span class="chev">▾</span></button>'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button><span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-nd="'+ew+'">＋ Dívida</button><button data-x="'+ew+'">Extrato</button><button data-rb="'+ew+'">Recibo</button><button data-q="'+ew+'">Quitar tudo</button></div></div><div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
     var gk={},ord=[];
     g[w].forEach(function(x){
       var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;
@@ -354,10 +353,72 @@ $("t_e").addEventListener("click",function(){
 });
 var rphoto="";
 function updR(){var n=$("who").value.trim();$("r_av").innerHTML=rphoto?'<img class="av" alt="" src="'+rphoto+'">':av(n||"?")}
-function openReg(){rphoto="";$("r_phone").value="";updR();$("rd").showModal();setTimeout(function(){$("who").focus()},60)}
+function dayDef(){var n=+LS.get("dv-day");return n>=1&&n<=31?n:10}
+function nextDue(day){
+  var n=new Date(),y=n.getFullYear(),m=n.getMonth(),t0=new Date(y,m,n.getDate()).getTime();
+  function mk(yy,mm){var last=new Date(yy,mm+1,0).getDate();return new Date(yy,mm,Math.min(day,last))}
+  var d=mk(y,m);if(d.getTime()<t0)d=mk(y,m+1);
+  return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+}
+function debtBlock(n){
+  return '<div class="dbk"><div class="dbk-h"><b>Dívida '+n+'</b><button type="button" class="x" data-rm title="Remover esta dívida">✕</button></div><div class="fg">'+
+  '<div class="full"><label>Nome da dívida</label><input class="d-name" required placeholder="Ex.: Celular"></div>'+
+  '<div><label>Valor total (R$)</label><input class="d-val" type="number" step="0.01" min="0.01" required placeholder="0,00"></div>'+
+  '<div><label>Parcelas</label><input class="d-np" type="number" min="1" max="60" value="1"></div>'+
+  '<div><label>1º vencimento</label><input class="d-date" type="date" required></div>'+
+  '<div><label>Parcelas já pagas</label><input class="d-pd" type="number" min="0" value="0"></div>'+
+  '<div class="full qk"><button type="button" class="pcs" data-q="0">Tudo pendente</button><button type="button" class="pcs" data-q="all">Tudo pago</button><span class="d-pv"></span></div>'+
+  '<div><label>Origem</label><input class="d-cat" list="cats" placeholder="Ex.: Nubank"></div>'+
+  '<div><label>Observação</label><input class="d-note" placeholder="Opcional"></div></div></div>';
+}
+function addBlock(){
+  var box=$("r_debts"),n=box.querySelectorAll(".dbk").length+1,w=document.createElement("div");
+  w.innerHTML=debtBlock(n);var bk=w.firstChild;box.appendChild(bk);
+  bk.querySelector(".d-date").value=nextDue(Math.max(1,Math.min(31,+$("r_day").value||dayDef())));
+  return bk;
+}
+function renumber(){document.querySelectorAll("#r_debts .dbk").forEach(function(b,i){b.querySelector(".dbk-h b").textContent="Dívida "+(i+1)});document.querySelectorAll("#r_debts [data-rm]").forEach(function(x,i,a){x.hidden=a.length<2})}
+function blkPrev(bk){
+  var a=parseFloat(bk.querySelector(".d-val").value),n=Math.max(1,Math.min(60,parseInt(bk.querySelector(".d-np").value)||1)),pdi=bk.querySelector(".d-pd"),p=Math.max(0,Math.min(n,parseInt(pdi.value)||0));
+  if(+pdi.value>n)pdi.value=n;
+  var out=bk.querySelector(".d-pv");
+  if(isNaN(a)||a<=0){out.textContent="";return}
+  var base=Math.floor(a/n*100)/100,last=Math.round((a-base*(n-1))*100)/100;
+  out.textContent=(n>1?n+"x de "+brl(base)+(last!==base?" (última "+brl(last)+")":""):brl(a))+(p?" · "+p+" paga"+(p>1?"s":""):" · tudo pendente");
+}
+function regHint(){
+  var nm=$("who").value.trim(),r=items.filter(function(x){return x.who===nm}),seen={},names=[];
+  r.forEach(function(x){var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;if(seen[k])return;seen[k]=1;names.push(x.desc.replace(/\s*\d+\/\d+$/,""))});
+  $("r_hint").textContent=names.length?nm+" já tem "+names.length+" dívida"+(names.length>1?"s":"")+": "+names.join(", ")+". As novas serão somadas às que já existem.":"";
+}
+function openReg(name){
+  rphoto="";$("r_phone").value="";$("who").value=name||"";$("r_day").value=dayDef();
+  $("r_debts").innerHTML="";addBlock();renumber();
+  $("who").dispatchEvent(new Event("input"));updR();regHint();
+  $("rd").showModal();setTimeout(function(){(name?$("r_debts").querySelector(".d-name"):$("who")).focus()},60);
+}
+$("r_add").addEventListener("click",function(){var bk=addBlock();renumber();snd("tap");bk.scrollIntoView({behavior:calm?"auto":"smooth",block:"center"});bk.querySelector(".d-name").focus()});
+$("r_day").addEventListener("input",function(){
+  var d=Math.max(1,Math.min(31,+$("r_day").value||dayDef()));
+  document.querySelectorAll("#r_debts .dbk").forEach(function(b){var dt=b.querySelector(".d-date");if(!dt.dataset.man)dt.value=nextDue(d)});
+});
+$("r_debts").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  var bk=b.closest(".dbk");
+  if(b.hasAttribute("data-rm")){if($("r_debts").querySelectorAll(".dbk").length>1){bk.remove();renumber();snd("tap")}return}
+  if(b.dataset.q!==undefined){bk.querySelector(".d-pd").value=b.dataset.q==="all"?(bk.querySelector(".d-np").value||1):0;blkPrev(bk)}
+});
+$("r_debts").addEventListener("input",function(e){
+  var bk=e.target.closest(".dbk");if(!bk)return;
+  if(e.target.classList.contains("d-date"))e.target.dataset.man="1";
+  blkPrev(bk);
+});
+$("cfg_day").addEventListener("change",function(){var n=Math.max(1,Math.min(31,parseInt($("cfg_day").value)||10));$("cfg_day").value=n;LS.set("dv-day",String(n));toast("Dia de vencimento padrão: "+n+".")});
+$("p_n").addEventListener("click",function(){var w=editName;closeDlg($("pd"));openReg(w)});
+$("k_n").addEventListener("click",function(){var w=kWho();closeDlg($("kd"));openReg(w)});
 $("rg").addEventListener("click",function(){snd("tap");openReg()});
 $("fab").addEventListener("click",function(){snd("tap");openReg()});
-$("who").addEventListener("input",function(){var p=people[$("who").value.trim()];if(p&&p.phone&&!$("r_phone").value)$("r_phone").value=p.phone;updR()});
+$("who").addEventListener("input",function(){var p=people[$("who").value.trim()];if(p&&p.phone&&!$("r_phone").value)$("r_phone").value=p.phone;updR();regHint()});
 $("r_pick").addEventListener("click",function(){$("r_file").click()});
 $("r_file").addEventListener("change",function(e){
   var f=e.target.files[0];if(!f)return;var img=new Image(),u=URL.createObjectURL(f);
@@ -489,6 +550,7 @@ $("list").addEventListener("click",function(e){
   if(D.w){cobrar(decodeURIComponent(D.w));return}
   if(D.gd){snd("tap");openDebt(D.gd);return}
   if(D.dd){var gr=sib(D.dd);if(!gr.length)return;gr.forEach(function(x){put(Object.assign({},x,{deleted:Date.now()}))});snd("del");toast("Dívida movida para a lixeira.",function(){gr.forEach(function(x){put(x)})});return}
+  if(D.nd){snd("tap");openReg(decodeURIComponent(D.nd));return}
   if(D.rb){snd("tap");openRecibo(decodeURIComponent(D.rb));return}
   if(D.rc){var ri=items.find(function(x){return x.id===D.rc});if(ri){snd("tap");openRecibo(ri.who,D.rc)}return}
   if(D.x){snd("tap");openStmt(decodeURIComponent(D.x));return}
@@ -537,25 +599,27 @@ $("ef").addEventListener("submit",function(e){
 function addDate(s,i){var p=s.split("-"),y=+p[0],m=+p[1]-1+i,dd=+p[2]||1,last=new Date(y,m+1,0).getDate(),d=new Date(y,m,Math.min(dd,last));return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
 $("f").addEventListener("submit",function(e){
   e.preventDefault();
-  var a=parseFloat($("val").value);if(isNaN(a))return;
-  var n=Math.max(1,Math.min(60,parseInt($("np").value)||1));
-  var base=Math.floor(a/n*100)/100,uid="d"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),d0=$("desc").value.trim();
-  for(var i=0;i<n;i++){
-    var amt=i<n-1?base:Math.round((a-base*(n-1))*100)/100,pd=i===0&&$("st").value==="1";
-    put({id:uid+"_"+i,desc:n>1?d0+" "+(i+1)+"/"+n:d0,who:$("who").value.trim(),cat:$("cat").value.trim(),amount:amt,date:addDate($("mon").value,i),month:addDate($("mon").value,i).slice(0,7),paid:pd,got:pd?amt:0,paidAt:pd?$("mon").value:"",note:$("note").value.trim(),ts:Date.now()+i});
-  }
-  var nm=$("who").value.trim(),ph=$("r_phone").value.trim();
-  if(ph||rphoto){var cur=people[nm]||{};putPerson(nm,{phone:ph||cur.phone||"",photo:rphoto||cur.photo||""})}
-  snd("add");closeDlg($("rd"));toast("Dívida registrada.");
-  ["who","desc","val","note","cat","r_phone"].forEach(function(i){$(i).value=""});$("np").value=1;$("st").value="0";rphoto="";prev();
+  var who=$("who").value.trim();if(!who)return;
+  var made=0,tp=0,tpd=0;
+  document.querySelectorAll("#r_debts .dbk").forEach(function(bk,bi){
+    var q=function(c){return bk.querySelector(c).value},a=parseFloat(q(".d-val")),name=q(".d-name").trim(),date=q(".d-date");
+    if(isNaN(a)||a<=0||!name||!date)return;
+    var n=Math.max(1,Math.min(60,parseInt(q(".d-np"))||1)),pn=Math.max(0,Math.min(n,parseInt(q(".d-pd"))||0));
+    var base=Math.floor(a/n*100)/100,uid="d"+Date.now().toString(36)+bi+Math.random().toString(36).slice(2,5),cat=q(".d-cat").trim(),note=q(".d-note").trim();
+    for(var i=0;i<n;i++){
+      var amt=i<n-1?base:Math.round((a-base*(n-1))*100)/100,dt=addDate(date,i),pd=i<pn;
+      put({id:uid+"_"+i,desc:n>1?name+" "+(i+1)+"/"+n:name,who:who,cat:cat,amount:amt,date:dt,month:dt.slice(0,7),paid:pd,got:pd?amt:0,paidAt:pd?(dt>today()?today():dt):"",note:note,ts:Date.now()+i+bi*100});
+    }
+    made++;tp+=n;tpd+=pn;
+  });
+  if(!made){toast("Preencha o nome, o valor e o vencimento da dívida.");return}
+  var ph=$("r_phone").value.trim();
+  if(ph||rphoto){var cur=people[who]||{};putPerson(who,{phone:ph||cur.phone||"",photo:rphoto||cur.photo||""})}
+  var dy=parseInt($("r_day").value);if(dy>=1&&dy<=31)LS.set("dv-day",String(dy));
+  snd("add");closeDlg($("rd"));
+  toast(made+" dívida"+(made>1?"s":"")+" registrada"+(made>1?"s":"")+" para "+who+" ("+tp+" parcela"+(tp>1?"s":"")+(tpd?", "+tpd+" já paga"+(tpd>1?"s":""):"")+").");
+  rphoto="";
 });
-function prev(){
-  var a=parseFloat($("val").value),n=Math.max(1,Math.min(60,parseInt($("np").value)||1));
-  if(isNaN(a)||a<=0||n<2){$("pv").textContent="";return}
-  var base=Math.floor(a/n*100)/100,last=Math.round((a-base*(n-1))*100)/100;
-  $("pv").textContent=n+"x de "+brl(base)+(last!==base?" (última "+brl(last)+")":"");
-}
-["val","np"].forEach(function(i){$(i).addEventListener("input",prev)});
 ["fm","fp","fs"].forEach(function(i){$(i).addEventListener("change",render)});
 $("q").addEventListener("input",render);
 
@@ -645,28 +709,36 @@ privApply();
 var recCur=null;
 function recData(w,id){
   var keyOf=function(x){var s=sib(x.id);return s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id};
-  var ref=id?items.find(function(x){return x.id===id}):null,want=ref?keyOf(ref):null,seen={},debts=[];
+  var ref=id?items.find(function(x){return x.id===id}):null,want=ref?keyOf(ref):null,seen={},debts=[],td=today();
   items.filter(function(x){return x.who===w}).forEach(function(x){
     var k=keyOf(x);if((want&&k!==want)||seen[k])return;seen[k]=1;
     var s=sib(x.id),r=(s.length?s:[x]).slice().sort(function(a,b){var p=a.date||a.month,q=b.date||b.month;return p<q?-1:p>q?1:0});
-    var d={title:r[0].desc.replace(/\s*\d+\/\d+$/,""),n:r.length,np:0,tot:0,pd:0,rs:0,next:null,parcels:[]};
+    var d={title:r[0].desc.replace(/\s*\d+\/\d+$/,""),n:r.length,np:0,tot:0,pd:0,rs:0,late:0,proofs:0,cat:"",note:"",day:r[0].date?+r[0].date.slice(8,10):0,next:null,parcels:[]};
     r.forEach(function(y){
       d.tot+=y.amount;d.pd+=got(y);d.rs+=rem(y);if(y.paid)d.np++;if(rem(y)>0&&!d.next)d.next=y;
+      if(!d.cat&&y.cat)d.cat=y.cat;if(!d.note&&y.note)d.note=y.note;
+      var late=rem(y)>0&&(y.date||y.month+"-31")<td;if(late)d.late++;if(y.proof)d.proofs++;
       var m=y.desc.match(/(\d+\/\d+)$/);
-      d.parcels.push({lbl:m?m[1]:"Única",amount:y.amount,paid:!!y.paid,part:(!y.paid&&got(y)>0)?got(y):0,when:y.paid&&y.paidAt?fdate(y.paidAt):"",due:y.date?fdate(y.date):monthName(y.month)});
+      d.parcels.push({lbl:m?m[1]:"Única",amount:y.amount,paid:!!y.paid,part:(!y.paid&&got(y)>0)?got(y):0,when:y.paid&&y.paidAt?fdate(y.paidAt):"",due:y.date?fdate(y.date):monthName(y.month),late:late,proof:!!y.proof});
     });
     d.nextDue=d.next?(d.next.date?fdate(d.next.date):monthName(d.next.month)):"";
+    d.pct=d.tot?Math.round(d.pd/d.tot*100):0;
+    d.meta=[d.cat?"Origem: "+d.cat:"",d.day?"vence todo dia "+d.day:"",d.note?"Obs.: "+d.note:""].filter(Boolean).join(" · ");
     debts.push(d);
   });
-  var tk=0,tr=0;debts.forEach(function(d){tk+=d.pd;tr+=d.rs});
+  var tk=0,tr=0,pp=0,pt=0,lt=0;debts.forEach(function(d){tk+=d.pd;tr+=d.rs;pp+=d.np;pt+=d.n;lt+=d.late});
   var n=new Date();
-  return {name:w,debts:debts,tk:tk,tr:tr,date:n.toLocaleDateString("pt-BR"),no:n.getFullYear()+pad(n.getMonth()+1)+pad(n.getDate())+"-"+pad(n.getHours())+pad(n.getMinutes())};
+  return {name:w,debts:debts,tk:tk,tr:tr,pp:pp,pt:pt,late:lt,date:n.toLocaleDateString("pt-BR"),no:n.getFullYear()+pad(n.getMonth()+1)+pad(n.getDate())+"-"+pad(n.getHours())+pad(n.getMinutes())};
 }
+function pStat(p){return p.paid?(p.when?"pago em "+p.when:"pago")+(p.proof?" · comprovante anexado":""):p.late?"ATRASADA":(p.part?"parcial "+brl(p.part)+" · ":"")+"pendente"}
+function recSum(R){return R.debts.length+" dívida"+(R.debts.length>1?"s":"")+" · "+R.pp+" de "+R.pt+" parcelas pagas"+(R.late?" · "+R.late+" atrasada"+(R.late>1?"s":""):"")}
 function recText(R){
-  var t="RECIBO · Quem Me Deve\nNº "+R.no+"\nCliente: "+R.name+"\nEmitido em "+R.date+"\n";
-  R.debts.forEach(function(d){
-    t+="\n"+d.title.toUpperCase()+"\nParcelas pagas: "+d.np+" de "+d.n+"\nValor total: "+brl(d.tot)+"\nJá pago: "+brl(d.pd)+"\nFalta: "+brl(d.rs)+"\n";
-    d.parcels.forEach(function(p){t+=(p.paid?"✓ ":"• ")+p.lbl+" · "+brl(p.amount)+" · "+(p.paid?(p.when?"pago em "+p.when:"pago"):(p.part?"parcial "+brl(p.part)+" · ":"")+"vence "+p.due)+"\n"});
+  var t="RECIBO · Quem Me Deve\nNº "+R.no+"\nCliente: "+R.name+"\nEmitido em "+R.date+"\nResumo: "+recSum(R)+"\n";
+  R.debts.forEach(function(d,i){
+    t+="\n"+(R.debts.length>1?"DÍVIDA "+(i+1)+" · ":"")+d.title.toUpperCase()+"\n"+(d.meta?d.meta+"\n":"")+
+    "Valor total: "+brl(d.tot)+(d.n>1?" em "+d.n+" parcelas":" (à vista)")+"\nJá pago: "+brl(d.pd)+" ("+d.pct+"%) · Falta: "+brl(d.rs)+"\n"+
+    "Parcelas pagas: "+d.np+" de "+d.n+" · pendentes: "+(d.n-d.np)+(d.late?" · atrasadas: "+d.late:"")+"\n";
+    d.parcels.forEach(function(p){t+=(p.paid?"✓ ":p.late?"! ":"• ")+p.lbl+" · vence "+p.due+" · "+brl(p.amount)+" · "+pStat(p)+"\n"});
     t+=d.nextDue?"Próximo vencimento: "+d.nextDue+"\n":"Dívida quitada ✓\n";
   });
   return t+"\nTOTAL PAGO: "+brl(R.tk)+"\nFALTA PAGAR: "+brl(R.tr)+"\n\nObrigado!";
@@ -674,11 +746,12 @@ function recText(R){
 function recHTML(R){
   return '<div class="rc-h"><img src="logo.png" alt=""><div><h2>Recibo</h2><div class="s">Quem Me Deve · Nº '+R.no+'</div><div class="s">Emitido em '+R.date+'</div></div></div>'+
   '<div class="rc-cl"><span class="s">Cliente</span><b>'+esc(R.name)+'</b></div>'+
-  R.debts.map(function(d){
-    var pc=d.tot?Math.round(d.pd/d.tot*100):0;
-    return '<div class="rc-debt"><div class="rc-dt"><b>'+esc(d.title)+'</b><span class="s">'+d.np+' de '+d.n+' parcela(s) paga(s)</span></div><div class="pb"><i style="width:'+pc+'%"></i></div>'+
-    '<div class="rc-stats"><div><small>Total</small><b>'+brl(d.tot)+'</b></div><div class="ok"><small>Já pago</small><b>'+brl(d.pd)+'</b></div><div class="pe"><small>Falta</small><b>'+brl(d.rs)+'</b></div></div>'+
-    d.parcels.map(function(p){return '<div class="rc-p'+(p.paid?" ok":"")+'"><span>'+(p.paid?"✓":"•")+" "+p.lbl+'</span><span class="s">'+(p.paid?(p.when?"pago em "+p.when:"pago"):(p.part?"parcial "+brl(p.part)+" · ":"")+"vence "+p.due)+'</span><b>'+brl(p.amount)+'</b></div>'}).join("")+
+  '<div class="rc-sum"><span>'+R.debts.length+' dívida'+(R.debts.length>1?"s":"")+'</span><span>'+R.pp+' de '+R.pt+' parcelas pagas</span>'+(R.late?'<span class="late">'+R.late+' atrasada'+(R.late>1?"s":"")+'</span>':"")+'</div>'+
+  R.debts.map(function(d,i){
+    return '<div class="rc-debt"><div class="rc-dt"><b>'+(R.debts.length>1?"Dívida "+(i+1)+" · ":"")+esc(d.title)+'</b><span class="s">'+d.np+' de '+d.n+' parcela(s) paga(s)</span></div>'+
+    (d.meta?'<div class="rc-meta">'+esc(d.meta)+'</div>':"")+'<div class="pb"><i style="width:'+d.pct+'%"></i></div>'+
+    '<div class="rc-stats"><div><small>Total</small><b>'+brl(d.tot)+'</b></div><div class="ok"><small>Já pago ('+d.pct+'%)</small><b>'+brl(d.pd)+'</b></div><div class="pe"><small>Falta</small><b>'+brl(d.rs)+'</b></div></div>'+
+    d.parcels.map(function(p){return '<div class="rc-p'+(p.paid?" ok":p.late?" late":"")+'"><span>'+(p.paid?"✓":p.late?"!":"•")+" "+p.lbl+'</span><span class="s">vence '+p.due+' · '+(p.late?'<span class="lt">ATRASADA</span>':esc(pStat(p)))+'</span><b>'+brl(p.amount)+'</b></div>'}).join("")+
     (d.nextDue?'<div class="s" style="margin-top:10px">Próximo vencimento: <b>'+d.nextDue+'</b></div>':'<div class="rc-q">Dívida quitada ✓</div>')+'</div>';
   }).join("")+
   '<div class="rc-t"><div><small>Total pago</small><b>'+brl(R.tk)+'</b></div><div><small>Falta pagar</small><b>'+brl(R.tr)+'</b></div></div>'+
@@ -700,11 +773,12 @@ $("rc_i").addEventListener("click",function(){
   var R=recCur,lg=new Image();
   lg.onload=function(){draw(true)};lg.onerror=function(){draw(false)};lg.src="logo.png";
   function draw(ok){
-    var W=760,P=34,LH=30,H=240;
-    R.debts.forEach(function(d){H+=148+d.parcels.length*LH+34+18});
+    var W=800,P=34,LH=30,x0=P+22,xr=W-P-22,H=300;
+    R.debts.forEach(function(d){H+=192+d.parcels.length*LH+44+18});
     H+=110+70;
     var cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=H*sc;
     var g=cv.getContext("2d");g.scale(sc,sc);
+    var fit=function(t,mw){while(g.measureText(t).width>mw&&t.length>4)t=t.slice(0,-2);return t};
     g.fillStyle="#fff";g.fillRect(0,0,W,H);
     var gr=g.createLinearGradient(0,0,W,150);gr.addColorStop(0,"#071f6e");gr.addColorStop(1,"#1d6bff");g.fillStyle=gr;g.fillRect(0,0,W,150);
     if(ok)g.drawImage(lg,P,24,102,102);
@@ -713,23 +787,27 @@ $("rc_i").addEventListener("click",function(){
     g.textAlign="right";g.font="14px system-ui,sans-serif";g.fillText("Nº "+R.no,W-P,62);g.fillText("Emitido em "+R.date,W-P,86);
     g.textAlign="left";g.fillStyle="#6a79a8";g.font="700 12px system-ui,sans-serif";g.fillText("CLIENTE",P,184);
     g.fillStyle="#0a1a45";g.font="800 28px system-ui,sans-serif";g.fillText(R.name,P,214);
-    var y=240,x0=P+20,xr=W-P-20;
-    R.debts.forEach(function(d){
-      var bh=148+d.parcels.length*LH+34;
+    g.fillStyle=R.late?"#c62828":"#6a79a8";g.font="700 14px system-ui,sans-serif";g.fillText(recSum(R),P,242);
+    var y=268;
+    R.debts.forEach(function(d,di){
+      var bh=192+d.parcels.length*LH+44;
       g.strokeStyle="#cfdaf7";g.lineWidth=1.5;g.setLineDash([6,5]);rr(g,P,y,W-2*P,bh,18);g.stroke();g.setLineDash([]);
-      g.textAlign="left";g.fillStyle="#0a1a45";g.font="800 20px system-ui,sans-serif";g.fillText(d.title,x0,y+36);
+      g.textAlign="left";g.fillStyle="#0a1a45";g.font="800 20px system-ui,sans-serif";g.fillText(fit((R.debts.length>1?"Dívida "+(di+1)+" · ":"")+d.title,xr-x0-170),x0,y+36);
       g.textAlign="right";g.fillStyle="#6a79a8";g.font="600 14px system-ui,sans-serif";g.fillText(d.np+" de "+d.n+" parcela(s) paga(s)",xr,y+36);
       g.fillStyle="#e3eaff";rr(g,x0,y+50,xr-x0,8,4);g.fill();
-      var pc=d.tot?d.pd/d.tot:0;if(pc>0){g.fillStyle="#16a34a";rr(g,x0,y+50,Math.max(8,(xr-x0)*pc),8,4);g.fill()}
-      var bw=(xr-x0-20)/3,st=[["TOTAL",brl(d.tot),"#0a1a45"],["JÁ PAGO",brl(d.pd),"#15803d"],["FALTA",brl(d.rs),"#b45309"]];
-      st.forEach(function(q,i){var bx=x0+i*(bw+10);g.fillStyle="#f1f5ff";rr(g,bx,y+72,bw,58,12);g.fill();g.textAlign="center";g.fillStyle="#6a79a8";g.font="700 10px system-ui,sans-serif";g.fillText(q[0],bx+bw/2,y+92);g.fillStyle=q[2];g.font="800 17px system-ui,sans-serif";g.fillText(q[1],bx+bw/2,y+115)});
+      if(d.pct>0){g.fillStyle="#16a34a";rr(g,x0,y+50,Math.max(8,(xr-x0)*d.pct/100),8,4);g.fill()}
+      var bw=(xr-x0-30)/4,st=[["TOTAL",brl(d.tot),"#0a1a45"],["JÁ PAGO ("+d.pct+"%)",brl(d.pd),"#15803d"],["FALTA",brl(d.rs),"#b45309"],["PARCELAS",d.np+" de "+d.n,"#0a1a45"]];
+      st.forEach(function(q,i){var bx=x0+i*(bw+10);g.fillStyle="#f1f5ff";rr(g,bx,y+72,bw,58,12);g.fill();g.textAlign="center";g.fillStyle="#6a79a8";g.font="700 10px system-ui,sans-serif";g.fillText(q[0],bx+bw/2,y+92);g.fillStyle=q[2];g.font="800 16px system-ui,sans-serif";g.fillText(q[1],bx+bw/2,y+115)});
+      g.textAlign="left";g.fillStyle="#6a79a8";g.font="600 13px system-ui,sans-serif";g.fillText(fit(d.meta||"—",xr-x0),x0,y+156);
+      g.fillStyle="#e3eaff";g.fillRect(x0,y+168,xr-x0,1.5);
       d.parcels.forEach(function(p,i){
-        var py=y+158+i*LH;
-        g.textAlign="left";g.font="700 15px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":"#0a1a45";g.fillText((p.paid?"✓ ":"• ")+p.lbl,x0,py);
-        g.font="14px system-ui,sans-serif";g.fillStyle="#6a79a8";g.fillText(p.paid?(p.when?"pago em "+p.when:"pago"):(p.part?"parcial "+brl(p.part)+" · ":"")+"vence "+p.due,x0+100,py);
+        var py=y+196+i*LH;
+        g.textAlign="left";g.font="700 15px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":p.late?"#c62828":"#0a1a45";g.fillText((p.paid?"✓ ":p.late?"! ":"• ")+p.lbl,x0,py);
+        g.font="14px system-ui,sans-serif";g.fillStyle="#6a79a8";g.fillText("vence "+p.due,x0+78,py);
+        g.font=p.late?"800 13px system-ui,sans-serif":"13px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":p.late?"#c62828":"#6a79a8";g.fillText(fit(pStat(p),xr-x0-300),x0+240,py);
         g.textAlign="right";g.font="700 15px system-ui,sans-serif";g.fillStyle="#0a1a45";g.fillText(brl(p.amount),xr,py);
       });
-      var ly=y+158+d.parcels.length*LH+8;
+      var ly=y+196+d.parcels.length*LH+12;
       g.textAlign="left";g.font="700 14px system-ui,sans-serif";
       if(d.nextDue){g.fillStyle="#6a79a8";g.fillText("Próximo vencimento: "+d.nextDue,x0,ly)}else{g.fillStyle="#15803d";g.fillText("Dívida quitada ✓",x0,ly)}
       y+=bh+18;
@@ -960,7 +1038,7 @@ $("pin_l").addEventListener("click",function(){
   closeDlg($("cd"));buf="";dots();$("lk_m").textContent="Digite seu PIN";$("lock").hidden=false;
 });
 $("cfg").addEventListener("click",function(){
-  sndBtn();themeBtn();pinBtn();
+  sndBtn();themeBtn();pinBtn();$("cfg_day").value=dayDef();
   $("i_hint").textContent=standalone?"Você já está usando o app instalado.":"Instala o site como app, com ícone e tela cheia no celular. Precisa estar hospedado em https.";
   snd("tap");$("cd").showModal();
 });

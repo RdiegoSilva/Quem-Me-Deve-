@@ -402,3 +402,18 @@ dialog#recd{width:min(580px,94vw)}
   dialog#recd::backdrop{display:none}
   .rc-act{display:none!important}
 }
+
+/* 14 · Registrar várias dívidas e recibo detalhado */
+dialog#rd{width:min(640px,94vw)}
+.dbk{border:1.5px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--bg)}
+.dbk-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dbk-h b{font-size:15px;font-weight:800}
+.dbk .fg{gap:10px}
+.qk{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.d-pv{margin-left:auto;font-size:13px;font-weight:700;color:var(--pr)}
+.rc-sum{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 2px}
+.rc-sum span{background:var(--bg);border:1.5px solid var(--bd);border-radius:99px;padding:5px 12px;font-size:12px;font-weight:700}
+.rc-sum .late{background:var(--peb);color:var(--pe);border-color:transparent}
+.rc-meta{font-size:12px;color:var(--mu);margin:-4px 0 8px}
+.rc-p.late>span:first-child,.rc-p .lt{color:var(--pe);font-weight:800}
+.rc-p .pc{color:var(--pr);font-size:11px;font-weight:700}

@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=15">
+<link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
 <div class="app">
@@ -108,7 +108,7 @@
 <div class="full pr"><span id="p_av"></span><div><button class="sec" type="button" id="p_pick">Escolher foto</button> <button class="sec" type="button" id="p_rm">Remover</button></div><input id="p_file" type="file" accept="image/*" hidden></div>
 <div class="full"><label for="p_name">Nome</label><input id="p_name" required></div>
 <div class="full"><label for="p_phone">WhatsApp (com DDD)</label><input id="p_phone" type="tel" inputmode="tel" placeholder="Ex.: 85 99999-9999"></div>
-<div class="full ktools"><button class="sec" type="button" id="p_w">💬 Cobrar</button><button class="sec" type="button" id="p_x">📄 Extrato</button><button class="sec" type="button" id="p_r">🧾 Recibo</button><button class="sec" type="button" id="p_q">✔ Quitar tudo</button></div>
+<div class="full ktools"><button class="sec" type="button" id="p_n">＋ Nova dívida</button><button class="sec" type="button" id="p_w">💬 Cobrar</button><button class="sec" type="button" id="p_x">📄 Extrato</button><button class="sec" type="button" id="p_r">🧾 Recibo</button><button class="sec" type="button" id="p_q">✔ Quitar tudo</button></div>
 <button class="sec" type="button" data-close="pd">Cancelar</button><button class="add" type="submit">Salvar</button>
 </form></dialog>
 
@@ -116,7 +116,7 @@
 <h2 class="full">Parcelas</h2>
 <p class="s full" id="k_t"></p>
 <div class="full" id="k_l"></div>
-<div class="full ktools"><button class="sec" type="button" id="k_w">💬 Cobrar</button><button class="sec" type="button" id="k_x">📄 Extrato</button><button class="sec" type="button" id="k_rc">🧾 Recibo</button><button class="sec" type="button" id="k_g">⚙ Dívida</button><button class="sec" type="button" id="k_p">👤 Pessoa</button></div>
+<div class="full ktools"><button class="sec" type="button" id="k_n">＋ Outra dívida</button><button class="sec" type="button" id="k_w">💬 Cobrar</button><button class="sec" type="button" id="k_x">📄 Extrato</button><button class="sec" type="button" id="k_rc">🧾 Recibo</button><button class="sec" type="button" id="k_g">⚙ Dívida</button><button class="sec" type="button" id="k_p">👤 Pessoa</button></div>
 <button class="sec full" type="button" id="k_all">Marcar todas como pagas</button>
 <button class="sec" type="button" data-close="kd">Cancelar</button><button class="add" type="submit">Salvar</button>
 </form></dialog>
@@ -138,19 +138,17 @@
 <button class="fab" id="fab" aria-label="Nova dívida">+</button>
 
 <dialog id="rd"><form id="f">
-<h2 class="full">Registrar dívida</h2>
+<h2 class="full">Registrar dívidas</h2>
 <div class="full pr"><span id="r_av"></span><div><button class="sec" type="button" id="r_pick">Foto da pessoa</button></div><input id="r_file" type="file" accept="image/*" hidden></div>
 <div><label for="who">Nome</label><input id="who" list="ppl" required placeholder="Ex.: Maria" autocomplete="off"><datalist id="ppl"></datalist></div>
 <div><label for="r_phone">WhatsApp (com DDD)</label><input id="r_phone" type="tel" inputmode="tel" placeholder="Ex.: 85 99999-9999"></div>
-<div class="full"><label for="desc">Descrição</label><input id="desc" required placeholder="Ex.: Compra parcelada 1/2"></div>
-<div><label for="cat">Origem</label><input id="cat" list="cats" placeholder="Ex.: Nubank"><datalist id="cats"></datalist></div>
-<div><label for="val">Valor total (R$)</label><input id="val" type="number" step="0.01" required placeholder="0,00"></div>
-<div><label for="mon">Data da dívida</label><input id="mon" type="date" required></div>
-<div><label for="st">Situação</label><select id="st"><option value="0">Pendente</option><option value="1">Pago</option></select></div>
-<div><label for="np">Nº de parcelas</label><input id="np" type="number" min="1" max="60" value="1"></div>
-<div class="pv" id="pv"></div>
-<div class="full"><label for="note">Observação (opcional)</label><input id="note" placeholder="Ex.: crédito, estorno, parcela 3/3"></div>
-<button class="sec" type="button" data-close="rd">Cancelar</button><button class="add" type="submit">Registrar</button>
+<p class="s full" id="r_hint"></p>
+<div><label for="r_day">Dia fixo de vencimento</label><input id="r_day" type="number" min="1" max="31" value="10"></div>
+<p class="s" style="align-self:end;margin:0 0 12px">Todo mês nesse dia. Dá para mudar a data de cada dívida.</p>
+<div class="full" id="r_debts"></div>
+<button class="sec full" type="button" id="r_add">＋ Adicionar outra dívida</button>
+<datalist id="cats"></datalist>
+<button class="sec" type="button" data-close="rd">Cancelar</button><button class="add" type="submit" id="r_go">Registrar</button>
 </form></dialog>
 
 <dialog id="cd"><div class="cs">
@@ -160,6 +158,9 @@
 <div class="cr"><span>Modo privacidade (esconder valores)</span><button class="sec" id="privb">Desativado</button></div>
 <div class="cr"><span>Efeitos e partículas</span><button class="sec" id="fxb">Ligado</button></div>
 <div class="cr"><span>Tema</span><select id="th"><option value="">Claro</option><option value="dark">Escuro</option></select></div></div>
+<div class="cg"><h3>Dívidas</h3>
+<div class="cr"><span>Dia padrão de vencimento</span><input id="cfg_day" type="number" min="1" max="31" style="width:90px;height:40px"></div>
+<p class="s">As novas dívidas vencem nesse dia, todo mês. Você pode mudar a data de cada dívida ao registrar.</p></div>
 <div class="cg"><h3>Segurança</h3>
 <div class="cr"><span>Pedir PIN ao abrir</span><button class="sec" id="pin_t">Ativado</button></div>
 <div class="cr"><span>Alterar PIN</span><button class="sec" id="pin_c">Alterar</button></div>
@@ -210,7 +211,7 @@
 
 <div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
 <canvas id="fxc" aria-hidden="true"></canvas>
-<script src="script.js?v=15"></script>
-<script src="efeitos.js?v=15"></script>
+<script src="script.js?v=16"></script>
+<script src="efeitos.js?v=16"></script>
 </body>
 </html>
