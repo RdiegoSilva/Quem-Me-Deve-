@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=18">
 </head>
 <body>
 <div class="app">
@@ -53,6 +53,7 @@
 <div class="ph"><h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> Minhas Dívidas <span class="s" id="cnt"></span></h2>
 <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar por nome..." aria-label="Buscar"></label></div>
 <div class="pf"><select id="fm" aria-label="Mês"></select><select id="fp" aria-label="Pessoa"></select><select id="fs" aria-label="Situação"><option value="">Todas</option><option value="0">Pendentes</option><option value="1">Pagas</option></select>
+<div class="seg" id="jseg" role="group" aria-label="Como mostrar as dívidas"><button type="button" data-j="0" class="on" title="Uma linha para cada dívida">Separadas</button><button type="button" data-j="1" title="Uma linha para cada pessoa, somando tudo">Juntar por pessoa</button></div>
 <div class="pfb"><button class="sec" id="expb">⇣ Abrir tudo</button><button class="sec" id="vw">☰ Cards</button><button class="sec" id="selb">☑ Selecionar</button></div></div>
 <div id="list"></div>
 </section>
@@ -107,8 +108,9 @@
 <p class="s full" id="p_hint">Mudar o total ajusta o valor das dívidas pendentes, na mesma proporção. O que já foi pago não muda.</p>
 <div class="full pr"><span id="p_av"></span><div><button class="sec" type="button" id="p_pick">Escolher foto</button> <button class="sec" type="button" id="p_rm">Remover</button></div><input id="p_file" type="file" accept="image/*" hidden></div>
 <div class="full"><label for="p_name">Nome</label><input id="p_name" required></div>
+<div class="full"><label for="p_code">Código / ID da pessoa</label><input id="p_code" placeholder="Ex.: C001" autocomplete="off"></div>
 <div class="full"><label for="p_phone">WhatsApp (com DDD)</label><input id="p_phone" type="tel" inputmode="tel" placeholder="Ex.: 85 99999-9999"></div>
-<div class="full ktools"><button class="sec" type="button" id="p_n">＋ Nova dívida</button><button class="sec" type="button" id="p_w">💬 Cobrar</button><button class="sec" type="button" id="p_x">📄 Extrato</button><button class="sec" type="button" id="p_r">🧾 Recibo</button><button class="sec" type="button" id="p_q">✔ Quitar tudo</button></div>
+<div class="full ktools"><button class="sec" type="button" id="p_pay">💵 Pagamento</button><button class="sec" type="button" id="p_n">＋ Nova dívida</button><button class="sec" type="button" id="p_w">💬 Cobrar</button><button class="sec" type="button" id="p_x">📄 Extrato</button><button class="sec" type="button" id="p_r">🧾 Recibo</button><button class="sec" type="button" id="p_q">✔ Quitar tudo</button></div>
 <button class="sec" type="button" data-close="pd">Cancelar</button><button class="add" type="submit">Salvar</button>
 </form></dialog>
 
@@ -116,7 +118,7 @@
 <h2 class="full">Parcelas</h2>
 <p class="s full" id="k_t"></p>
 <div class="full" id="k_l"></div>
-<div class="full ktools"><button class="sec" type="button" id="k_n">＋ Outra dívida</button><button class="sec" type="button" id="k_w">💬 Cobrar</button><button class="sec" type="button" id="k_x">📄 Extrato</button><button class="sec" type="button" id="k_rc">🧾 Recibo</button><button class="sec" type="button" id="k_g">⚙ Dívida</button><button class="sec" type="button" id="k_p">👤 Pessoa</button></div>
+<div class="full ktools"><button class="sec" type="button" id="k_pay">💵 Pagamento</button><button class="sec" type="button" id="k_n">＋ Outra dívida</button><button class="sec" type="button" id="k_w">💬 Cobrar</button><button class="sec" type="button" id="k_x">📄 Extrato</button><button class="sec" type="button" id="k_rc">🧾 Recibo</button><button class="sec" type="button" id="k_g">⚙ Dívida</button><button class="sec" type="button" id="k_p">👤 Pessoa</button></div>
 <button class="sec full" type="button" id="k_all">Marcar todas como pagas</button>
 <button class="sec" type="button" data-close="kd">Cancelar</button><button class="add" type="submit">Salvar</button>
 </form></dialog>
@@ -127,9 +129,11 @@
 <button class="sec" id="x_c">Copiar texto</button><button class="sec" data-close="xd">Fechar</button>
 </div></dialog>
 
-<dialog id="vd"><img id="v_img" alt="Comprovante" style="width:100%;border-radius:14px;max-height:65vh;object-fit:contain;background:var(--bg)">
-<div class="fg" style="margin-top:12px"><button class="sec" id="v_dl">Baixar</button><button class="sec" id="v_re">Trocar foto</button><button class="sec" id="v_rm">Remover</button><button class="add" data-close="vd">Fechar</button></div></dialog>
-<input id="pfile" type="file" accept="image/*" hidden>
+<dialog id="vd"><div class="s" id="v_c" style="margin-bottom:6px"></div>
+<img id="v_img" alt="Comprovante" style="width:100%;border-radius:14px;max-height:58vh;object-fit:contain;background:var(--bg)">
+<div id="v_th" class="thumbs"></div>
+<div class="fg" style="margin-top:12px"><button class="sec" id="v_dl">Baixar</button><button class="sec" id="v_re">＋ Adicionar</button><button class="sec" id="v_rm">Remover esta</button><button class="add" data-close="vd">Fechar</button></div></dialog>
+<input id="pfile" type="file" accept="image/*" multiple hidden>
 
 <dialog id="td"><h2>🗑 Lixeira</h2><p class="s">Itens apagados ficam aqui por 30 dias e podem ser restaurados.</p>
 <div id="t_l"></div>
@@ -143,8 +147,9 @@
 <div><label for="who">Nome</label><input id="who" list="ppl" required placeholder="Ex.: Maria" autocomplete="off"><datalist id="ppl"></datalist></div>
 <div><label for="r_phone">WhatsApp (com DDD)</label><input id="r_phone" type="tel" inputmode="tel" placeholder="Ex.: 85 99999-9999"></div>
 <p class="s full" id="r_hint"></p>
+<div><label for="r_code">Código / ID (opcional)</label><input id="r_code" placeholder="Automático" autocomplete="off"></div>
 <div><label for="r_day">Dia fixo de vencimento</label><input id="r_day" type="number" min="1" max="31" value="10"></div>
-<p class="s" style="align-self:end;margin:0 0 12px">Todo mês nesse dia. Dá para mudar a data de cada dívida.</p>
+<p class="s full" style="margin:-4px 0 0">As parcelas vencem todo mês nesse dia. Dá para mudar a data de cada dívida.</p>
 <div class="full" id="r_debts"></div>
 <button class="sec full" type="button" id="r_add">＋ Adicionar outra dívida</button>
 <datalist id="cats"></datalist>
@@ -196,7 +201,8 @@
 
 <div id="lock"><div class="lk"><div class="logo"><img src="logo.png" alt=""></div><h2>Quem Me Deve</h2><p class="s" id="lk_m">Digite seu PIN</p><div class="dots" id="lk_d"></div><div class="pad" id="lk_p"></div></div></div>
 
-<dialog id="recd"><div id="rc_b"></div>
+<dialog id="recd"><label class="ck" id="rc_jw" hidden><input type="checkbox" id="rc_j"> Juntar todas as dívidas em um só quadro</label>
+<div id="rc_b"></div>
 <div class="fg rc-act">
 <button class="add" id="rc_w">Enviar no WhatsApp</button><button class="sec" id="rc_i">Imagem</button>
 <button class="sec" id="rc_c">Copiar texto</button><button class="sec" id="rc_p">Imprimir / PDF</button>
@@ -209,9 +215,24 @@
 <button class="sec full" type="button" id="dg_x">🗑 Apagar dívida inteira</button>
 <button class="sec" type="button" data-close="dg">Cancelar</button><button class="add" type="submit">Salvar</button></form></dialog>
 
+<dialog id="pg"><form class="fg" id="pgf">
+<h2 class="full">💵 Registrar pagamento</h2>
+<p class="s full" id="pg_t"></p>
+<div class="pgsum full"><div><small>Falta pagar</small><b id="pg_rem">R$ 0,00</b></div><div><small>Depois deste pagamento</small><b id="pg_after">R$ 0,00</b></div></div>
+<div><label for="pg_v">Valor recebido (R$)</label><input id="pg_v" type="number" step="0.01" min="0.01" required placeholder="0,00"></div>
+<div><label for="pg_m">Forma de pagamento</label><select id="pg_m"><option>Pix</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option><option>Boleto</option><option>Outro</option></select></div>
+<div><label for="pg_d">Data do pagamento</label><input id="pg_d" type="date" required></div>
+<div style="align-self:end"><button class="sec" type="button" id="pg_all" style="width:100%">Pagar tudo</button></div>
+<p class="s full" id="pg_ex" style="margin:-4px 0 0"></p>
+<div class="full"><label for="pg_n">Observação</label><input id="pg_n" placeholder="Opcional"></div>
+<div class="full"><label>Comprovantes (pode ser mais de um)</label><div class="thumbs" id="pg_th"></div><button class="sec" type="button" id="pg_add">＋ Adicionar fotos</button></div>
+<button class="sec" type="button" data-close="pg">Fechar</button><button class="add" type="submit" id="pg_go">Registrar pagamento</button>
+<div class="full" id="pg_h"></div>
+</form></dialog>
+
 <div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
 <canvas id="fxc" aria-hidden="true"></canvas>
-<script src="script.js?v=16"></script>
-<script src="efeitos.js?v=16"></script>
+<script src="script.js?v=18"></script>
+<script src="efeitos.js?v=18"></script>
 </body>
 </html>

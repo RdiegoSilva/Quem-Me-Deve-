@@ -417,3 +417,46 @@ dialog#rd{width:min(640px,94vw)}
 .rc-meta{font-size:12px;color:var(--mu);margin:-4px 0 8px}
 .rc-p.late>span:first-child,.rc-p .lt{color:var(--pe);font-weight:800}
 .rc-p .pc{color:var(--pr);font-size:11px;font-weight:700}
+
+/* 15 · Juntar dívidas por pessoa */
+.seg{display:inline-flex;background:var(--bg);border:1.5px solid var(--bd);border-radius:12px;padding:3px;gap:2px}
+.seg button{padding:7px 14px;font-size:13px;font-weight:700;background:transparent;color:var(--mu);border-radius:9px}
+.seg button.on{background:var(--pr);color:#fff}
+.jsum{display:none;margin:12px 2px 0;padding:11px 14px;border-radius:14px;background:color-mix(in srgb,var(--pr) 7%,var(--card));border:1.5px solid var(--bd);font-size:13px;align-items:center;gap:6px;flex-wrap:wrap}
+.jsum span{margin-left:auto;font-weight:800}
+.group.jn .jsum{display:flex}
+.group.jn .debt{display:none}
+.group.jn.open .debt{display:block}
+.group.jn:not(.open) .pt .chev{transform:rotate(-90deg)}
+.ab-r{background:linear-gradient(180deg,#f7b500,#d99200)}
+.ab-n{background:linear-gradient(180deg,#19b3b3,#0e8f8f)}
+.tw td.dsc small{display:block;font-size:11px;font-weight:500;color:var(--mu);max-width:260px;margin:0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rc-p.wide>span:first-child{width:auto;flex:0 1 44%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 16 · Código/ID, pagamentos e comprovantes */
+.cd{display:inline-block;margin-left:8px;padding:1px 9px;border-radius:99px;background:color-mix(in srgb,var(--pr) 12%,transparent);color:var(--pr);font-size:11px;font-weight:800;letter-spacing:.04em;vertical-align:middle}
+.nm{display:inline-block;vertical-align:middle;text-align:left}
+.tw .nm .cd{display:table;margin:2px 0 0}
+.gn+.cd{margin-left:0}
+.dt b .cd,.dt .cd{margin:0 0 2px}
+.ab-p{background:linear-gradient(180deg,#9b6dff,#6d3fd8)}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.thumbs .th{position:relative}
+.thumbs img{width:64px;height:64px;object-fit:cover;border-radius:12px;border:2px solid var(--bd);cursor:pointer;display:block}
+.thumbs img.on{border-color:var(--pr)}
+.thumbs .th button{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;padding:0;background:var(--pe);color:#fff;font-size:11px;line-height:1}
+#v_th{flex-wrap:nowrap;overflow-x:auto;margin-top:10px;padding-bottom:4px}
+.pgsum{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pgsum div{background:var(--bg);border:1.5px solid var(--bd);border-radius:16px;padding:10px 14px}
+.pgsum small{display:block;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.pgsum b{font-size:20px;font-weight:800}
+.pgsum div:last-child b{color:var(--ok)}
+.ph-title{margin:6px 0 2px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.ph-row{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1.5px dashed var(--bd)}
+.ph-row>div:first-child{flex:1;min-width:0}
+.ph-row b{font-weight:800}
+.ph-row .mt{background:var(--okb);color:var(--ok);border-radius:99px;padding:1px 9px;font-size:11px;font-weight:800;margin-left:6px}
+.ph-row .thumbs{margin:0;flex-wrap:nowrap}.ph-row .thumbs img{width:40px;height:40px;border-radius:10px}
+.rc-pays{margin-top:14px}
+.rc-pays .rc-p>span:first-child{width:92px}
+.priv :is(.pgsum b,.ph-row>div>b,.rc-pays b){filter:blur(7px);user-select:none}
