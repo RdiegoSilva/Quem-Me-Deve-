@@ -460,3 +460,15 @@ dialog#rd{width:min(640px,94vw)}
 .rc-pays{margin-top:14px}
 .rc-pays .rc-p>span:first-child{width:92px}
 .priv :is(.pgsum b,.ph-row>div>b,.rc-pays b){filter:blur(7px);user-select:none}
+
+/* 17 · Observações */
+.pobs{margin:12px 2px 0;padding:9px 13px;border-radius:12px;background:color-mix(in srgb,var(--gold) 16%,var(--card));border:1.5px solid color-mix(in srgb,var(--gold) 40%,transparent);font-size:13px}
+.pob{display:block;font-style:italic;font-weight:500;color:var(--mu);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tw td:nth-child(2) small{max-width:240px;margin:0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 18 · Recebi um pagamento (atalho rápido) */
+.mchips{display:flex;flex-wrap:wrap;gap:8px}
+.mchips button{padding:8px 14px;font-size:13px;font-weight:700;background:var(--card);border:1.5px solid var(--bd);border-radius:99px}
+.mchips button.on{background:var(--pr);border-color:var(--pr);color:#fff}
+.pgq{background:var(--bg);border:1.5px solid var(--bd);border-radius:16px;padding:12px}
+#qpay2{padding:9px 14px;font-size:13px}

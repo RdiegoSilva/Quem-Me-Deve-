@@ -63,7 +63,7 @@ function remove(id){
   if(col)col.doc(id).delete();else{items=items.filter(function(x){return x.id!==id});bin=bin.filter(function(x){return x.id!==id});saveLocal();render()}
 }
 function putPerson(n,p){
-  var o={phone:p.phone||"",photo:p.photo||"",code:p.code||(people[n]&&people[n].code)||""};
+  var o={phone:p.phone||"",photo:p.photo||"",code:p.code||(people[n]&&people[n].code)||"",obs:p.obs!==undefined?p.obs:((people[n]&&people[n].obs)||"")};
   if(col){people[n]=o;col.doc(pid(n)).set(Object.assign({type:"person",name:n},o)).catch(function(){alert("Erro ao salvar")})}
   else{people[n]=o;saveLocal();render()}
 }
@@ -126,7 +126,7 @@ function render(){
   Object.keys(g).sort().forEach(function(w){
     var pend=0,gT=0,gG=0;g[w].forEach(function(x){pend+=rem(x);gT+=x.amount;gG+=got(x)});var pc=gT?Math.round(gG/gT*100):0;
     var ew=encodeURIComponent(w);
-    h+='<div class="group'+(jn?" jn"+(openJ[w]?" open":""):(shutP[w]?" shut":""))+'"><div class="gh"><button class="tgl pt" data-gp="'+ew+'" aria-label="Abrir ou fechar" title="Abrir ou fechar"><span class="chev">▾</span></button>'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button>'+cdh(w)+'<span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-pay="'+ew+'">💵 Pagamento</button><button data-nd="'+ew+'">＋ Dívida</button><button data-x="'+ew+'">Extrato</button><button data-rb="'+ew+'">Recibo</button><button data-q="'+ew+'">Quitar tudo</button></div></div><div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
+    h+='<div class="group'+(jn?" jn"+(openJ[w]?" open":""):(shutP[w]?" shut":""))+'"><div class="gh"><button class="tgl pt" data-gp="'+ew+'" aria-label="Abrir ou fechar" title="Abrir ou fechar"><span class="chev">▾</span></button>'+av(w)+'<button class="gn" data-r="'+ew+'" title="Editar pessoa">'+esc(w)+'</button>'+cdh(w)+'<span class="gp">pendente '+brl(pend)+'</span><button class="gear" data-r="'+ew+'" title="Total da dívida, foto e telefone" aria-label="Configurações de '+esc(w).replace(/"/g,"")+'">⚙</button><div class="ga"><button class="wa" data-w="'+ew+'">Cobrar no WhatsApp</button><button data-pay="'+ew+'">💵 Pagamento</button><button data-nd="'+ew+'">＋ Dívida</button><button data-x="'+ew+'">Extrato</button><button data-rb="'+ew+'">Recibo</button><button data-q="'+ew+'">Quitar tudo</button></div></div>'+pobBlock(w)+'<div class="pb gpb" title="'+pc+'% pago"><i style="width:'+pc+'%"></i></div>';
     var gk={},ord=[];
     g[w].forEach(function(x){
       var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;
@@ -408,7 +408,7 @@ function regHint(){
   $("r_hint").textContent=names.length?nm+" já tem "+names.length+" dívida"+(names.length>1?"s":"")+": "+names.join(", ")+". As novas serão somadas às que já existem.":"";
 }
 function openReg(name){
-  rphoto="";$("r_phone").value="";$("r_code").value="";delete $("r_code").dataset.man;$("who").value=name||"";$("r_day").value=dayDef();
+  rphoto="";$("r_phone").value="";$("r_code").value="";$("r_obs").value=(name&&people[name]&&people[name].obs)||"";delete $("r_code").dataset.man;$("who").value=name||"";$("r_day").value=dayDef();
   $("r_debts").innerHTML="";addBlock();renumber();
   $("who").dispatchEvent(new Event("input"));updR();regHint();
   $("rd").showModal();setTimeout(function(){(name?$("r_debts").querySelector(".d-name"):$("who")).focus()},60);
@@ -435,7 +435,7 @@ $("p_n").addEventListener("click",function(){var w=editName;closeDlg($("pd"));op
 $("k_n").addEventListener("click",function(){var w=kWho();closeDlg($("kd"));openReg(w)});
 $("rg").addEventListener("click",function(){snd("tap");openReg()});
 $("fab").addEventListener("click",function(){snd("tap");openReg()});
-$("who").addEventListener("input",function(){var p=people[$("who").value.trim()];if(p&&p.phone&&!$("r_phone").value)$("r_phone").value=p.phone;if(p&&p.code&&!$("r_code").dataset.man)$("r_code").value=p.code;updR();regHint()});
+$("who").addEventListener("input",function(){var p=people[$("who").value.trim()];if(p&&p.phone&&!$("r_phone").value)$("r_phone").value=p.phone;if(p&&p.code&&!$("r_code").dataset.man)$("r_code").value=p.code;if(p&&p.obs&&!$("r_obs").value)$("r_obs").value=p.obs;updR();regHint()});
 $("r_pick").addEventListener("click",function(){$("r_file").click()});
 $("r_file").addEventListener("change",function(e){
   var f=e.target.files[0];if(!f)return;var img=new Image(),u=URL.createObjectURL(f);
@@ -512,6 +512,8 @@ $("v_rm").addEventListener("click",function(){
 /* ---------- código/ID e número da dívida ---------- */
 var dnLast=0;
 function cd(n){return (people[n]||{}).code||""}
+function pobh(n){var o=(people[n]||{}).obs;return o?'<small class="pob" title="'+esc(o).replace(/"/g,"&quot;")+'">'+esc(o)+'</small>':""}
+function pobBlock(n){var o=(people[n]||{}).obs;return o?'<div class="pobs">📝 '+esc(o)+'</div>':""}
 function cdh(n){return cd(n)?'<span class="cd">'+esc(cd(n))+'</span>':""}
 function keyOfX(x){var s=sib(x.id);return s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id}
 function nextDn(){var m=dnLast;items.concat(bin).forEach(function(x){if(x.dn>m)m=x.dn});dnLast=m+1;return dnLast}
@@ -583,14 +585,54 @@ function pgHist(){
   }).join(""):"";
 }
 function pgRefresh(){pgAfter();pgHist()}
-function openPay(who,key){
-  pgS={who:who,key:key||"",proofs:[]};
-  var it=key?items.filter(function(x){return keyOfX(x)===key})[0]:null;
-  $("pg_t").innerHTML=(it?"Dívida: <b>"+esc(it.desc.replace(/\s*\d+\/\d+$/,""))+"</b> · ":"Todas as dívidas · ")+esc(who)+(cd(who)?" ("+esc(cd(who))+")":"")+(key?"":". O valor desconta primeiro das parcelas mais antigas.");
-  $("pg_v").value="";$("pg_n").value="";$("pg_d").value=today();$("pg_m").value=LS.get("dv-pm")||"Pix";
-  pgThumbs();pgRefresh();
-  $("pg").showModal();setTimeout(function(){$("pg_v").focus()},60);
+function pgTitle(){
+  var who=pgS.who,key=pgS.key,it=key?items.filter(function(x){return keyOfX(x)===key})[0]:null;
+  $("pg_t").innerHTML=who?((it?"Dívida: <b>"+esc(it.desc.replace(/\s*\d+\/\d+$/,""))+"</b> · ":"Todas as dívidas · ")+esc(who)+(cd(who)?" ("+esc(cd(who))+")":"")+(key?"":". O valor desconta primeiro das parcelas mais antigas.")):"";
 }
+function mSync(){var m=$("pg_m").value;document.querySelectorAll("#pg_ch button").forEach(function(b){b.classList.toggle("on",b.dataset.m===m)})}
+function fillWho(sel){
+  var by={};items.forEach(function(x){if(rem(x)>0)by[x.who]=(by[x.who]||0)+rem(x)});
+  var ns=Object.keys(by).sort(function(a,b){return a.localeCompare(b)});
+  $("pg_who").innerHTML=ns.map(function(n){return '<option value="'+esc(n).replace(/"/g,"&quot;")+'">'+esc(n)+(cd(n)?" ("+esc(cd(n))+")":"")+" · falta "+brl(by[n])+'</option>'}).join("");
+  if(sel&&ns.indexOf(sel)>=0)$("pg_who").value=sel;
+  return ns.length;
+}
+function fillDbt(){
+  var who=$("pg_who").value,seen={},o='<option value="">Todas as dívidas (mais antigas primeiro)</option>';
+  items.filter(function(x){return x.who===who&&rem(x)>0}).forEach(function(x){
+    var k=keyOfX(x);if(seen[k])return;seen[k]=1;
+    o+='<option value="'+k+'">'+esc(x.desc.replace(/\s*\d+\/\d+$/,""))+(x.dn?" · Nº "+x.dn:"")+" · falta "+brl(pRem(who,k))+'</option>';
+  });
+  $("pg_dbt").innerHTML=o;
+}
+function openPay(who,key,quick){
+  pgS={who:who||"",key:key||"",proofs:[]};
+  $("pgq").hidden=!quick;
+  if(quick){
+    if(!fillWho(who)){toast("Ninguém está devendo no momento.");return}
+    pgS.who=$("pg_who").value;fillDbt();$("pg_q").value="";
+  }
+  pgTitle();
+  $("pg_v").value="";$("pg_n").value="";$("pg_d").value=today();$("pg_m").value=LS.get("dv-pm")||(quick?"Dinheiro":"Pix");mSync();
+  pgThumbs();pgRefresh();
+  $("pg").showModal();setTimeout(function(){(quick?$("pg_q"):$("pg_v")).focus()},60);
+}
+$("pg_ch").addEventListener("click",function(e){var b=e.target.closest("button");if(b){$("pg_m").value=b.dataset.m;mSync();snd("tap")}});
+$("pg_m").addEventListener("change",mSync);
+$("pg_who").addEventListener("change",function(){pgS.who=$("pg_who").value;pgS.key="";fillDbt();pgTitle();pgRefresh()});
+$("pg_dbt").addEventListener("change",function(){pgS.key=$("pg_dbt").value;pgTitle();pgRefresh()});
+function nrmT(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")}
+$("pg_q").addEventListener("input",function(){
+  var t=nrmT($("pg_q").value),m=t.match(/(\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:[.,]\d{1,2})?)/);
+  if(m){var n=m[1];n=n.indexOf(",")>=0&&n.indexOf(".")>=0?n.replace(/\./g,"").replace(",","."):n.replace(",",".");$("pg_v").value=n}
+  var mm=/pix/.test(t)?"Pix":/dinheiro|especie|cash|mao/.test(t)?"Dinheiro":/cartao/.test(t)?"Cartão":/transfer|ted|doc/.test(t)?"Transferência":/boleto/.test(t)?"Boleto":"";
+  if(mm){$("pg_m").value=mm;mSync()}
+  var opts=[].slice.call($("pg_who").options),hit=opts.filter(function(o){var nm=nrmT(o.value);return nm&&t.indexOf(nm)>=0})[0]||opts.filter(function(o){var f=nrmT(o.value).split(" ")[0];return f.length>2&&t.split(/\s+/).indexOf(f)>=0})[0];
+  if(hit&&hit.value!==$("pg_who").value){$("pg_who").value=hit.value;pgS.who=hit.value;pgS.key="";fillDbt();pgTitle()}
+  pgRefresh();
+});
+$("qpay").addEventListener("click",function(){snd("tap");openPay("","",true)});
+$("qpay2").addEventListener("click",function(){snd("tap");openPay("","",true)});
 $("pg_v").addEventListener("input",pgAfter);
 $("pg_all").addEventListener("click",function(){$("pg_v").value=pRem(pgS.who,pgS.key)||"";pgAfter()});
 $("pg_add").addEventListener("click",function(){attachTo({k:"form"})});
@@ -636,7 +678,7 @@ function openPerson(w){
   editName=w;var p=people[w]||{};photo=p.photo||"";
   var ps=items.filter(function(x){return x.who===w}),T=0,G=0,R=0;ps.forEach(function(x){T+=x.amount;G+=got(x);R+=rem(x)});
   $("p_sum").innerHTML='<div class="t"><small>Total da dívida · '+ps.length+' registro(s)</small><input id="p_total" type="number" step="0.01" min="0" value="'+T.toFixed(2)+'" aria-label="Total da dívida"></div><div><small>Já pagou</small><b>'+brl(G)+'</b></div><div><small>Falta pagar</small><b>'+brl(R)+'</b></div>';
-  $("p_name").value=w;$("p_code").value=(people[w]||{}).code||"";$("p_phone").value=p.phone||"";$("p_av").innerHTML=av(w);
+  $("p_name").value=w;$("p_code").value=(people[w]||{}).code||"";$("p_obs").value=(people[w]||{}).obs||"";$("p_phone").value=p.phone||"";$("p_av").innerHTML=av(w);
   $("pd").showModal();
 }
 $("p_pick").addEventListener("click",function(){$("p_file").click()});
@@ -682,7 +724,7 @@ $("pf").addEventListener("submit",function(e){
     if(adj&&nn===old)toast("Total ajustado para "+brl(T1)+".",function(){ps.forEach(function(x){put(x)})});
   }
   if(nn!==old)delPerson(old);
-  putPerson(nn,{phone:$("p_phone").value.trim(),photo:photo,code:pcode});
+  putPerson(nn,{phone:$("p_phone").value.trim(),photo:photo,code:pcode,obs:$("p_obs").value.trim()});
   closeDlg($("pd"));snd("ok");
 });
 
@@ -755,7 +797,7 @@ $("f").addEventListener("submit",function(e){
   e.preventDefault();
   var who=$("who").value.trim();if(!who)return;
   var rcode=$("r_code").value.trim().toUpperCase();if(rcode&&codeTaken(rcode,who)){toast("Esse código já é de outra pessoa.");return}
-  var made=0,tp=0,tpd=0;
+  var made=0,tp=0,tpd=0,cur0=people[who]||{};
   document.querySelectorAll("#r_debts .dbk").forEach(function(bk,bi){
     var q=function(c){return bk.querySelector(c).value},a=parseFloat(q(".d-val")),name=q(".d-name").trim(),date=q(".d-date");
     if(isNaN(a)||a<=0||!name||!date)return;
@@ -769,7 +811,8 @@ $("f").addEventListener("submit",function(e){
   });
   if(!made){toast("Preencha o nome, o valor e o vencimento da dívida.");return}
   var ph=$("r_phone").value.trim();
-  if(ph||rphoto||rcode){var cur=people[who]||{};putPerson(who,{phone:ph||cur.phone||"",photo:rphoto||cur.photo||"",code:rcode||cur.code||""})}
+  var robs=$("r_obs").value.trim();
+  if(ph||rphoto||rcode||robs!==(cur0.obs||"")){var cur=people[who]||{};putPerson(who,{phone:ph||cur.phone||"",photo:rphoto||cur.photo||"",code:rcode||cur.code||"",obs:robs})}
   var dy=parseInt($("r_day").value);if(dy>=1&&dy<=31)LS.set("dv-day",String(dy));
   snd("add");closeDlg($("rd"));
   toast(made+" dívida"+(made>1?"s":"")+" registrada"+(made>1?"s":"")+" para "+who+" ("+tp+" parcela"+(tp>1?"s":"")+(tpd?", "+tpd+" já paga"+(tpd>1?"s":""):"")+").");
@@ -809,14 +852,14 @@ function openDebt(id){
   dgIds=r.map(function(x){return x.id});var multi=r.length>1;
   $("dg_t").textContent=multi?r.length+" parcelas. O novo nome vale para todas elas.":"Dívida de uma parcela.";
   $("dg_n").value=multi?r[0].desc.replace(/\s*\d+\/\d+$/,""):r[0].desc;
-  $("dg_w").value=r[0].who;$("dg_c").value=(r.filter(function(x){return x.cat})[0]||{}).cat||"";
+  $("dg_w").value=r[0].who;$("dg_o").value=(r.filter(function(x){return x.note})[0]||{}).note||"";$("dg_c").value=(r.filter(function(x){return x.cat})[0]||{}).cat||"";
   $("dg").showModal();
 }
 $("dgf").addEventListener("submit",function(e){
   e.preventDefault();
-  var base=$("dg_n").value.trim(),w=$("dg_w").value.trim(),c=$("dg_c").value.trim();if(!base||!w)return;
+  var base=$("dg_n").value.trim(),w=$("dg_w").value.trim(),c=$("dg_c").value.trim(),nt=$("dg_o").value.trim();if(!base||!w)return;
   var r=items.filter(function(x){return dgIds.indexOf(x.id)>=0}),multi=r.length>1;
-  r.forEach(function(x){var m=x.desc.match(/\s*(\d+\/\d+)$/);put(Object.assign({},x,{desc:multi?base+(m?" "+m[1]:""):base,who:w,cat:c}))});
+  r.forEach(function(x){var m=x.desc.match(/\s*(\d+\/\d+)$/);put(Object.assign({},x,{desc:multi?base+(m?" "+m[1]:""):base,who:w,cat:c,note:nt}))});
   closeDlg($("dg"));snd("ok");toast("Dívida atualizada.",function(){r.forEach(function(x){put(x)})});
 });
 $("dg_x").addEventListener("click",function(){
@@ -1046,7 +1089,7 @@ function tableJoined(v){
     var e=encodeURIComponent(p.who),x=p.nx&&p.nx.x,due=x?(x.date?fdate(x.date):monthName(x.month)):'<span class="q">Quitado</span>';
     var st=p.rs<=0?['st-ok','Quitado']:p.late?['st-late','Atrasado']:p.pd>0?['st-ok','Em dia']:['st-pe','Pendente'];
     var nms=p.names.slice(0,3).join(", ")+(p.names.length>3?" +"+(p.names.length-3):"");
-    return '<tr class="gr" data-gj="'+e+'" title="Ver extrato" style="animation-delay:'+Math.min(i,10)*40+'ms"><td class="n">'+av(p.who)+'<span class="nm">'+esc(p.who)+cdh(p.who)+'</span></td><td class="dsc"><b>'+nm+' dívida'+(nm>1?"s":"")+'</b><small title="'+esc(p.names.join(", "))+'">'+esc(nms)+'</small></td><td class="v">'+brl(p.tot)+'</td><td class="num">'+p.n+'x<small>'+p.np+(p.np===1?" paga":" pagas")+'</small></td><td class="num">'+brl(p.pd)+'</td><td class="r'+(p.rs<=0?" z":"")+'">'+brl(p.rs)+'</td><td class="num">'+due+'</td><td><span class="st '+st[0]+'">'+st[1]+'</span></td><td class="ac">'+
+    return '<tr class="gr" data-gj="'+e+'" title="Ver extrato" style="animation-delay:'+Math.min(i,10)*40+'ms"><td class="n">'+av(p.who)+'<span class="nm">'+esc(p.who)+cdh(p.who)+pobh(p.who)+'</span></td><td class="dsc"><b>'+nm+' dívida'+(nm>1?"s":"")+'</b><small title="'+esc(p.names.join(", "))+'">'+esc(nms)+'</small></td><td class="v">'+brl(p.tot)+'</td><td class="num">'+p.n+'x<small>'+p.np+(p.np===1?" paga":" pagas")+'</small></td><td class="num">'+brl(p.pd)+'</td><td class="r'+(p.rs<=0?" z":"")+'">'+brl(p.rs)+'</td><td class="num">'+due+'</td><td><span class="st '+st[0]+'">'+st[1]+'</span></td><td class="ac">'+
       '<button class="ab ab-p" data-pay="'+e+'" title="Registrar pagamento (Pix, dinheiro...)" aria-label="Registrar pagamento">'+IC_P+'</button><button class="ab ab-g" data-r="'+e+'" title="Pessoa: total, foto e telefone" aria-label="Configurações da pessoa">'+IC_G+'</button>'+
       '<button class="ab ab-w" data-w="'+e+'" title="Cobrar no WhatsApp" aria-label="Cobrar no WhatsApp">'+IC_W+'</button>'+
       '<button class="ab ab-r" data-rb="'+e+'" title="Recibo com todas as dívidas" aria-label="Recibo">'+IC_R+'</button>'+
@@ -1060,7 +1103,7 @@ function tableHTML(v){
   v.forEach(function(x){
     var s=sib(x.id),k=s.length?x.id.slice(0,x.id.lastIndexOf("_")+1):x.id;
     if(seen[k])return;seen[k]=1;
-    var r=s.length?s:[x],o={id:x.id,kk:k,dn:(r[0]||x).dn||0,who:x.who,desc:r[0].desc.replace(/\s*\d+\/\d+$/,""),n:r.length,tot:0,pd:0,rs:0,np:0,nx:null};
+    var r=s.length?s:[x],o={id:x.id,kk:k,dn:(r[0]||x).dn||0,note:(r.filter(function(y){return y.note})[0]||{}).note||"",who:x.who,desc:r[0].desc.replace(/\s*\d+\/\d+$/,""),n:r.length,tot:0,pd:0,rs:0,np:0,nx:null};
     r.forEach(function(y){o.tot+=y.amount;o.pd+=got(y);o.rs+=rem(y);if(y.paid)o.np++;if(rem(y)>0&&!o.nx)o.nx=y});
     o.key=o.nx?(o.nx.date||o.nx.month+"-01"):"9999";
     gs.push(o);
@@ -1075,7 +1118,7 @@ function tableHTML(v){
     var late=o.nx&&(o.nx.date||o.nx.month+"-31")<td;
     var st=o.rs<=0?['st-ok','Quitado']:late?['st-late','Atrasado']:o.pd>0?['st-ok','Em dia']:['st-pe','Pendente'];
     var multi=o.n>1;
-    return '<tr class="gr" data-g="'+o.id+'" title="Ver parcelas" style="animation-delay:'+Math.min(i,10)*40+'ms"><td class="n">'+av(o.who)+'<span class="nm">'+esc(o.who)+cdh(o.who)+'</span></td><td>'+esc(o.desc)+(o.dn?'<small>Nº '+o.dn+'</small>':"")+'</td><td class="v">'+brl(o.tot)+'</td><td class="num">'+o.n+'x'+sub+'</td><td class="num">'+brl(o.pd)+'</td><td class="r'+(o.rs<=0?" z":"")+'">'+brl(o.rs)+'</td><td class="num">'+due+'</td><td><span class="st '+st[0]+'">'+st[1]+'</span></td><td class="ac"><button class="ab ab-p" data-pay="'+encodeURIComponent(o.who)+'" data-pk="'+o.kk+'" title="Registrar pagamento (Pix, dinheiro...)" aria-label="Registrar pagamento">'+IC_P+'</button><button class="ab ab-g" data-r="'+encodeURIComponent(o.who)+'" title="Pessoa: total, foto, telefone, extrato e recibo" aria-label="Configurações da pessoa">'+IC_G+'</button><button class="ab ab-w" data-w="'+encodeURIComponent(o.who)+'" title="Cobrar no WhatsApp" aria-label="Cobrar no WhatsApp">'+IC_W+'</button><button class="ab ab-e" '+(multi?'data-gd':'data-e')+'="'+o.id+'" title="Editar" aria-label="Editar">'+IC_E+'</button><button class="ab ab-d" '+(multi?'data-dd':'data-d')+'="'+o.id+'" title="Apagar" aria-label="Apagar">'+IC_D+'</button></td></tr>';
+    return '<tr class="gr" data-g="'+o.id+'" title="Ver parcelas" style="animation-delay:'+Math.min(i,10)*40+'ms"><td class="n">'+av(o.who)+'<span class="nm">'+esc(o.who)+cdh(o.who)+pobh(o.who)+'</span></td><td>'+esc(o.desc)+(o.dn||o.note?'<small title="'+esc(o.note||"").replace(/"/g,"&quot;")+'">'+(o.dn?'Nº '+o.dn:"")+(o.dn&&o.note?" · ":"")+esc(o.note||"")+'</small>':"")+'</td><td class="v">'+brl(o.tot)+'</td><td class="num">'+o.n+'x'+sub+'</td><td class="num">'+brl(o.pd)+'</td><td class="r'+(o.rs<=0?" z":"")+'">'+brl(o.rs)+'</td><td class="num">'+due+'</td><td><span class="st '+st[0]+'">'+st[1]+'</span></td><td class="ac"><button class="ab ab-p" data-pay="'+encodeURIComponent(o.who)+'" data-pk="'+o.kk+'" title="Registrar pagamento (Pix, dinheiro...)" aria-label="Registrar pagamento">'+IC_P+'</button><button class="ab ab-g" data-r="'+encodeURIComponent(o.who)+'" title="Pessoa: total, foto, telefone, extrato e recibo" aria-label="Configurações da pessoa">'+IC_G+'</button><button class="ab ab-w" data-w="'+encodeURIComponent(o.who)+'" title="Cobrar no WhatsApp" aria-label="Cobrar no WhatsApp">'+IC_W+'</button><button class="ab ab-e" '+(multi?'data-gd':'data-e')+'="'+o.id+'" title="Editar" aria-label="Editar">'+IC_E+'</button><button class="ab ab-d" '+(multi?'data-dd':'data-d')+'="'+o.id+'" title="Apagar" aria-label="Apagar">'+IC_D+'</button></td></tr>';
   }).join("");
   return '<div class="tw"><table><thead><tr><th>Nome</th><th>Descrição</th><th>Valor Total</th><th>Parcelas</th><th>Já Pago</th><th>Restante</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td colspan="2">Total · '+gs.length+' dívida(s)</td><td>'+brl(T)+'</td><td></td><td>'+brl(P)+'</td><td>'+brl(R)+'</td><td colspan="3"></td></tr></tfoot></table></div>';
 }
@@ -1281,7 +1324,7 @@ $("mode").textContent="Salvo neste aparelho.";
     col=c;$("mode").textContent="Salvo na sua conta, só você vê.";
     c.onSnapshot(function(s){
       items=[];bin=[];people={};pays=[];
-      s.docs.forEach(function(d){var o=d.data();if(o.type==="person")people[o.name]={phone:o.phone||"",photo:o.photo||"",code:o.code||""};else if(o.type==="pay")pays.push(Object.assign({id:d.id},o));else (o.deleted?bin:items).push(Object.assign({id:d.id},o))});
+      s.docs.forEach(function(d){var o=d.data();if(o.type==="person")people[o.name]={phone:o.phone||"",photo:o.photo||"",code:o.code||"",obs:o.obs||""};else if(o.type==="pay")pays.push(Object.assign({id:d.id},o));else (o.deleted?bin:items).push(Object.assign({id:d.id},o))});
       purge();render();
     },function(){col=null;loadLocal();render();$("mode").textContent="Salvo neste aparelho."});
     if(mi.length||Object.keys(mp).length||mpy.length){
