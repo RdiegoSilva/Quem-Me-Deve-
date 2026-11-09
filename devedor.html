@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quem Me Deve · Área do devedor</title>
+<meta name="theme-color" content="#02296b">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="devedor.css?v=21">
+</head>
+<body class="dvb">
+
+<!-- ENTRAR -->
+<div id="login" class="lgn">
+<form id="lf" class="lc" autocomplete="on">
+<img class="lgl" src="logo.png" alt="Quem Me Deve">
+<h1>Área do devedor</h1>
+<p class="s">Entre com o seu <b>ID</b> e a sua <b>senha</b> para ver as suas dívidas.</p>
+<div><label for="l_id">ID</label><input id="l_id" placeholder="Ex.: C001" autocapitalize="characters" autocomplete="username" required></div>
+<div><label for="l_pw">Senha</label><input id="l_pw" type="password" autocomplete="current-password" required></div>
+<label class="ck"><input type="checkbox" id="l_rm" checked> Lembrar meu ID neste aparelho</label>
+<button class="add big" type="submit" id="l_go">Entrar</button>
+<p class="err" id="l_err" role="alert"></p>
+<button type="button" class="lnk" id="l_forgot">Esqueci minha senha</button>
+<p class="s foot">O ID e a senha são enviados por quem cobra. Só você consegue ver os seus dados.</p>
+</form>
+</div>
+
+<!-- PAINEL DO DEVEDOR -->
+<div id="app" hidden>
+<header class="dtop">
+<div class="brand"><img src="logo.png" alt=""><div><b id="d_hi">Olá</b><span class="s" id="d_id"></span></div></div>
+<div class="dclock"><span id="d_clk"></span><button class="tb-i" id="d_print" title="Imprimir meu extrato" aria-label="Imprimir">🖨</button><button class="sec" id="d_out">Sair</button></div>
+</header>
+
+<main class="dmain">
+<section class="dhero rise">
+<div><div class="s" id="d_stl">Situação</div><span class="st" id="d_st"></span><p class="dnx" id="d_nx"></p></div>
+<button class="go" id="d_pay"><span class="gi">$</span> Pagar</button>
+</section>
+
+<section class="kpis">
+<div class="kpi k1 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-5a2 2 0 0 1 0-4z"/></svg></span><div><small>Total da dívida</small><b id="k_t">R$ 0,00</b></div></div>
+<div class="kpi k2 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><div><small>Já pagou</small><b id="k_p">R$ 0,00</b></div></div>
+<div class="kpi k3 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><small>Falta pagar</small><b id="k_r">R$ 0,00</b></div></div>
+<div class="kpi k4 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></span><div><small>Parcelas pendentes</small><b id="k_n">0</b></div></div>
+</section>
+
+<section class="panel rise"><div class="ph"><h2>Minhas dívidas</h2></div><div id="d_debts" class="dbody"></div></section>
+<section class="panel rise"><div class="ph"><h2>Pagamentos recebidos</h2></div><div id="d_pays" class="dbody"></div></section>
+<p class="s dupd" id="d_upd"></p>
+</main>
+</div>
+
+<!-- PAGAR -->
+<dialog id="pgd"><div class="cs">
+<h2>💳 Pagar</h2>
+<div class="cg"><h3>Quanto você vai pagar?</h3>
+<div class="mchips" id="pq"></div>
+<div style="margin-top:10px"><label for="pq_v">Valor (R$)</label><input id="pq_v" type="number" step="0.01" min="0.01" placeholder="0,00"></div></div>
+<div class="cg" id="pk_box"><h3>Pague com Pix</h3><div id="pk_main"></div></div>
+<div class="cg"><h3>Já pagou?</h3>
+<p class="s">Depois de pagar, avise para conferirmos e darmos baixa.</p>
+<div class="fg"><div><label for="pq_m">Forma</label><select id="pq_m"><option>Pix</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option><option>Boleto</option></select></div><div style="align-self:end"><button class="add" id="pq_wa" style="width:100%">Avisar no WhatsApp</button></div></div></div>
+<button class="sec" data-close="pgd">Fechar</button>
+</div></dialog>
+
+<div id="toast" role="status"><span id="tm"></span></div>
+<script src="qrcode.js"></script>
+<script src="shared.js?v=21"></script>
+<script src="devedor.js?v=21"></script>
+</body>
+</html>
