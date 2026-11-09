@@ -75,3 +75,27 @@
   dialog .fg{flex-wrap:wrap}
   dialog .fg>*{flex:1 1 140px}
 }
+
+/* ==========================================================
+   Extrato e recibo · cores do tema preto e dourado
+   ========================================================== */
+.xh,.rc-h h2{color:var(--pr)}
+.rc-h img{box-shadow:0 0 0 2px rgba(212,175,55,.6)}
+.xt{background:color-mix(in srgb,var(--tx) 6%,transparent);border:1px solid var(--bd)}
+.rc-t{background:linear-gradient(120deg,#f7d96b,#d4af37);color:#111;box-shadow:0 14px 30px -18px #d4af37}
+.rc-t small{color:#111;opacity:.75}
+.rc-debt{background:color-mix(in srgb,var(--tx) 3%,transparent)}
+.rc-q{color:var(--ok)}
+.rc-meta,.rc-p .s{color:var(--mu)}
+.rc-sum .late{background:var(--peb);color:var(--pe)}
+:root[data-theme="light"] .rc-t{color:#111}
+@media(max-width:700px){
+  .rc-stats{grid-template-columns:1fr 1fr}
+  .rc-t{grid-template-columns:1fr}
+  .rc-t b{font-size:20px}
+  .xr b,.rc-p b{white-space:normal}
+}
+@media print{
+  .rc-t{background:#f2c94c!important;color:#111!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .xh,.rc-h h2{color:#8a6a0a!important}
+}

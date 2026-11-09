@@ -295,7 +295,7 @@ function stmt(w){
   return {tp:tp,tk:tk,sec:[
     {t:"Pendente",c:"#b45309",r:r.filter(function(x){return rem(x)>0}).map(function(x){return [lbl(x),brl(rem(x))]})},
     {t:"Já pago",c:"#14803c",r:r.filter(function(x){return got(x)>0}).map(function(x){return [lbl(x)+(x.paid&&x.paidAt?" · pago em "+ddmm(x.paidAt):x.paid?"":" · parcial"),brl(got(x))]})},
-    {t:"Pagamentos recebidos",c:"#1a5fe0",r:pays.filter(function(p){return p.who===w}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0}).map(function(p){return [fdate(p.date)+" · "+p.method+((p.proofs||[]).length?" · "+p.proofs.length+" comp.":""),brl(p.amount)]})}
+    {t:"Pagamentos recebidos",c:"#9a7410",r:pays.filter(function(p){return p.who===w}).sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:0}).map(function(p){return [fdate(p.date)+" · "+p.method+((p.proofs||[]).length?" · "+p.proofs.length+" comp.":""),brl(p.amount)]})}
   ]};
 }
 function stmtText(w){
@@ -322,22 +322,22 @@ $("x_i").addEventListener("click",function(){
   var cv=document.createElement("canvas"),sc=Math.max(.6,Math.min(2,Math.sqrt(12e6/(W*(H+rows*L+120)))));cv.width=Math.round(W*sc);cv.height=Math.round((H+rows*L+120)*sc);
   var g=cv.getContext("2d");g.scale(sc,sc);
   g.fillStyle="#fff";g.fillRect(0,0,W,cv.height);
-  var gr=g.createLinearGradient(0,0,W,H);gr.addColorStop(0,"#4a0988");gr.addColorStop(1,"#b13fe0");g.fillStyle=gr;g.fillRect(0,0,W,H);
+  var gr=g.createLinearGradient(0,0,W,H);gr.addColorStop(0,"#000000");gr.addColorStop(1,"#2a2208");g.fillStyle=gr;g.fillRect(0,0,W,H);
   g.fillStyle="#fff";g.font="700 30px system-ui,sans-serif";g.fillText(xName,P,64);
-  g.font="16px system-ui,sans-serif";g.globalAlpha=.85;g.fillText("Extrato de dívidas · "+new Date().toLocaleDateString("pt-BR"),P,96);g.globalAlpha=1;
+  g.fillStyle="#f2c94c";g.font="16px system-ui,sans-serif";g.fillText("Extrato de dívidas · "+new Date().toLocaleDateString("pt-BR"),P,96);g.fillStyle="#d4af37";g.fillRect(0,H-4,W,4);
   var fit=function(t,mw){while(g.measureText(t).width>mw&&t.length>3)t=t.slice(0,-2);return t};
   s.sec.forEach(function(x){
     if(!x.r.length)return;
     y+=L-6;g.fillStyle=x.c;g.font="700 15px system-ui,sans-serif";g.textAlign="left";g.fillText(x.t.toUpperCase(),P,y);y+=8;
     x.r.forEach(function(r){
-      y+=L;g.font="16px system-ui,sans-serif";g.fillStyle="#1b1a24";g.textAlign="left";
+      y+=L;g.font="16px system-ui,sans-serif";g.fillStyle="#141414";g.textAlign="left";
       var vw=g.measureText(r[1]).width;g.fillText(fit(r[0],W-P*2-vw-16),P,y-8);
       g.font="700 16px system-ui,sans-serif";g.textAlign="right";g.fillText(r[1],W-P,y-8);
-      g.fillStyle="#e7e2f3";g.fillRect(P,y,W-P*2,1);
+      g.fillStyle="#e6dfc9";g.fillRect(P,y,W-P*2,1);
     });
   });
   y+=44;g.textAlign="left";g.font="700 20px system-ui,sans-serif";
-  g.fillStyle="#14803c";g.fillText("Pago "+brl(s.tk),P,y);
+  g.fillStyle="#12803c";g.fillText("Pago "+brl(s.tk),P,y);
   g.fillStyle="#b45309";g.textAlign="right";g.fillText("Falta "+brl(s.tp),W-P,y);
   cv.toBlob(function(b){
     var f=new File([b],"extrato-"+xName.replace(/\s+/g,"-")+".png",{type:"image/png"});
@@ -1009,51 +1009,51 @@ $("rc_i").addEventListener("click",function(){
     var g=cv.getContext("2d");g.scale(sc,sc);
     var fit=function(t,mw){while(g.measureText(t).width>mw&&t.length>4)t=t.slice(0,-2);return t};
     g.fillStyle="#fff";g.fillRect(0,0,W,H);
-    var gr=g.createLinearGradient(0,0,W,150);gr.addColorStop(0,"#071f6e");gr.addColorStop(1,"#1d6bff");g.fillStyle=gr;g.fillRect(0,0,W,150);
+    var gr=g.createLinearGradient(0,0,W,150);gr.addColorStop(0,"#000000");gr.addColorStop(1,"#2a2208");g.fillStyle=gr;g.fillRect(0,0,W,150);
     if(ok)g.drawImage(lg,P,24,102,102);
-    g.textAlign="left";g.fillStyle="#ffd21f";g.font="800 38px system-ui,sans-serif";g.fillText("RECIBO",P+120,70);
+    g.textAlign="left";g.fillStyle="#f2c94c";g.font="800 38px system-ui,sans-serif";g.fillText("RECIBO",P+120,70);
     g.fillStyle="#fff";g.font="600 16px system-ui,sans-serif";g.fillText("Quem Me Deve",P+120,98);
     g.textAlign="right";g.font="14px system-ui,sans-serif";g.fillText("Nº "+R.no,W-P,62);g.fillText("Emitido em "+R.date,W-P,86);
-    g.textAlign="left";g.fillStyle="#6a79a8";g.font="700 12px system-ui,sans-serif";g.fillText("CLIENTE",P,184);
-    g.fillStyle="#0a1a45";g.font="800 28px system-ui,sans-serif";g.fillText(R.name+(R.code?"   ·   "+R.code:""),P,214);
-    g.fillStyle=R.late?"#c62828":"#6a79a8";g.font="700 14px system-ui,sans-serif";g.fillText(recSum(R),P,242);
+    g.textAlign="left";g.fillStyle="#6f6a5a";g.font="700 12px system-ui,sans-serif";g.fillText("CLIENTE",P,184);
+    g.fillStyle="#141414";g.font="800 28px system-ui,sans-serif";g.fillText(R.name+(R.code?"   ·   "+R.code:""),P,214);
+    g.fillStyle=R.late?"#c62828":"#6f6a5a";g.font="700 14px system-ui,sans-serif";g.fillText(recSum(R),P,242);
     var y=268;
     R.debts.forEach(function(d,di){
       var bh=192+d.parcels.length*LH+44;
-      g.strokeStyle="#cfdaf7";g.lineWidth=1.5;g.setLineDash([6,5]);rr(g,P,y,W-2*P,bh,18);g.stroke();g.setLineDash([]);
-      g.textAlign="left";g.fillStyle="#0a1a45";g.font="800 20px system-ui,sans-serif";g.fillText(fit((R.debts.length>1?"Dívida "+(di+1)+" · ":"")+dtl(d),xr-x0-170),x0,y+36);
-      g.textAlign="right";g.fillStyle="#6a79a8";g.font="600 14px system-ui,sans-serif";g.fillText(d.np+" de "+d.n+" parcela(s) paga(s)",xr,y+36);
-      g.fillStyle="#e3eaff";rr(g,x0,y+50,xr-x0,8,4);g.fill();
+      g.strokeStyle="#e6dfc9";g.lineWidth=1.5;g.setLineDash([6,5]);rr(g,P,y,W-2*P,bh,18);g.stroke();g.setLineDash([]);
+      g.textAlign="left";g.fillStyle="#141414";g.font="800 20px system-ui,sans-serif";g.fillText(fit((R.debts.length>1?"Dívida "+(di+1)+" · ":"")+dtl(d),xr-x0-170),x0,y+36);
+      g.textAlign="right";g.fillStyle="#6f6a5a";g.font="600 14px system-ui,sans-serif";g.fillText(d.np+" de "+d.n+" parcela(s) paga(s)",xr,y+36);
+      g.fillStyle="#efe8d0";rr(g,x0,y+50,xr-x0,8,4);g.fill();
       if(d.pct>0){g.fillStyle="#16a34a";rr(g,x0,y+50,Math.max(8,(xr-x0)*d.pct/100),8,4);g.fill()}
-      var bw=(xr-x0-30)/4,st=[["TOTAL",brl(d.tot),"#0a1a45"],["JÁ PAGO ("+d.pct+"%)",brl(d.pd),"#15803d"],["FALTA",brl(d.rs),"#b45309"],["PARCELAS",d.np+" de "+d.n,"#0a1a45"]];
-      st.forEach(function(q,i){var bx=x0+i*(bw+10);g.fillStyle="#f1f5ff";rr(g,bx,y+72,bw,58,12);g.fill();g.textAlign="center";g.fillStyle="#6a79a8";g.font="700 10px system-ui,sans-serif";g.fillText(q[0],bx+bw/2,y+92);g.fillStyle=q[2];g.font="800 16px system-ui,sans-serif";g.fillText(q[1],bx+bw/2,y+115)});
-      g.textAlign="left";g.fillStyle="#6a79a8";g.font="600 13px system-ui,sans-serif";g.fillText(fit(d.meta||"—",xr-x0),x0,y+156);
-      g.fillStyle="#e3eaff";g.fillRect(x0,y+168,xr-x0,1.5);
+      var bw=(xr-x0-30)/4,st=[["TOTAL",brl(d.tot),"#141414"],["JÁ PAGO ("+d.pct+"%)",brl(d.pd),"#15803d"],["FALTA",brl(d.rs),"#b45309"],["PARCELAS",d.np+" de "+d.n,"#141414"]];
+      st.forEach(function(q,i){var bx=x0+i*(bw+10);g.fillStyle="#faf6e8";rr(g,bx,y+72,bw,58,12);g.fill();g.textAlign="center";g.fillStyle="#6f6a5a";g.font="700 10px system-ui,sans-serif";g.fillText(q[0],bx+bw/2,y+92);g.fillStyle=q[2];g.font="800 16px system-ui,sans-serif";g.fillText(q[1],bx+bw/2,y+115)});
+      g.textAlign="left";g.fillStyle="#6f6a5a";g.font="600 13px system-ui,sans-serif";g.fillText(fit(d.meta||"—",xr-x0),x0,y+156);
+      g.fillStyle="#efe8d0";g.fillRect(x0,y+168,xr-x0,1.5);
       d.parcels.forEach(function(p,i){
         var py=y+196+i*LH,o1=d.wide?200:78,o2=d.wide?330:240;
-        g.textAlign="left";g.font="700 15px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":p.late?"#c62828":"#0a1a45";g.fillText(d.wide?fit((p.paid?"✓ ":p.late?"! ":"• ")+p.lbl,o1-14):(p.paid?"✓ ":p.late?"! ":"• ")+p.lbl,x0,py);
-        g.font="14px system-ui,sans-serif";g.fillStyle="#6a79a8";g.fillText("vence "+p.due,x0+o1,py);
-        g.font=p.late?"800 13px system-ui,sans-serif":"13px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":p.late?"#c62828":"#6a79a8";g.fillText(fit(pStat(p),xr-x0-o2-110),x0+o2,py);
-        g.textAlign="right";g.font="700 15px system-ui,sans-serif";g.fillStyle="#0a1a45";g.fillText(brl(p.amount),xr,py);
+        g.textAlign="left";g.font="700 15px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":p.late?"#c62828":"#141414";g.fillText(d.wide?fit((p.paid?"✓ ":p.late?"! ":"• ")+p.lbl,o1-14):(p.paid?"✓ ":p.late?"! ":"• ")+p.lbl,x0,py);
+        g.font="14px system-ui,sans-serif";g.fillStyle="#6f6a5a";g.fillText("vence "+p.due,x0+o1,py);
+        g.font=p.late?"800 13px system-ui,sans-serif":"13px system-ui,sans-serif";g.fillStyle=p.paid?"#15803d":p.late?"#c62828":"#6f6a5a";g.fillText(fit(pStat(p),xr-x0-o2-110),x0+o2,py);
+        g.textAlign="right";g.font="700 15px system-ui,sans-serif";g.fillStyle="#141414";g.fillText(brl(p.amount),xr,py);
       });
       var ly=y+196+d.parcels.length*LH+12;
       g.textAlign="left";g.font="700 14px system-ui,sans-serif";
-      if(d.nextDue){g.fillStyle="#6a79a8";g.fillText("Próximo vencimento: "+d.nextDue,x0,ly)}else{g.fillStyle="#15803d";g.fillText("Dívida quitada ✓",x0,ly)}
+      if(d.nextDue){g.fillStyle="#6f6a5a";g.fillText("Próximo vencimento: "+d.nextDue,x0,ly)}else{g.fillStyle="#15803d";g.fillText("Dívida quitada ✓",x0,ly)}
       y+=bh+18;
     });
     if(R.pays.length){
-      g.textAlign="left";g.fillStyle="#6a79a8";g.font="700 12px system-ui,sans-serif";g.fillText("PAGAMENTOS RECEBIDOS",x0,y+16);y+=28;
+      g.textAlign="left";g.fillStyle="#6f6a5a";g.font="700 12px system-ui,sans-serif";g.fillText("PAGAMENTOS RECEBIDOS",x0,y+16);y+=28;
       R.pays.forEach(function(p){
-        g.textAlign="left";g.font="14px system-ui,sans-serif";g.fillStyle="#0a1a45";
+        g.textAlign="left";g.font="14px system-ui,sans-serif";g.fillStyle="#141414";
         g.fillText(fit(p.date+" · "+p.method+(p.nc?" · "+p.nc+" comprovante"+(p.nc>1?"s":""):"")+(p.note?" · "+p.note:""),xr-x0-130),x0,y+10);
         g.textAlign="right";g.font="700 15px system-ui,sans-serif";g.fillText(brl(p.amount),xr,y+10);y+=LH;
       });
       y+=16;
     }
-    var yg=g.createLinearGradient(P,y,W-P,y+90);yg.addColorStop(0,"#ffd21f");yg.addColorStop(1,"#ffb300");g.fillStyle=yg;rr(g,P,y,W-2*P,90,20);g.fill();
-    g.fillStyle="#0a1a45";g.textAlign="left";g.font="800 11px system-ui,sans-serif";g.fillText("TOTAL PAGO",x0,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tk),x0,y+66);
+    var yg=g.createLinearGradient(P,y,W-P,y+90);yg.addColorStop(0,"#f2c94c");yg.addColorStop(1,"#ffb300");g.fillStyle=yg;rr(g,P,y,W-2*P,90,20);g.fill();
+    g.fillStyle="#141414";g.textAlign="left";g.font="800 11px system-ui,sans-serif";g.fillText("TOTAL PAGO",x0,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tk),x0,y+66);
     g.textAlign="right";g.font="800 11px system-ui,sans-serif";g.fillText("FALTA PAGAR",xr,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tr),xr,y+66);
-    g.textAlign="center";g.fillStyle="#6a79a8";g.font="12px system-ui,sans-serif";g.fillText("Este recibo confirma os pagamentos registrados até "+R.date+". Obrigado!",W/2,y+90+36);
+    g.textAlign="center";g.fillStyle="#6f6a5a";g.font="12px system-ui,sans-serif";g.fillText("Este recibo confirma os pagamentos registrados até "+R.date+". Obrigado!",W/2,y+90+36);
     var cb=function(b){
       if(!b){if(ok){draw(false);return}toast("Não consegui gerar a imagem do recibo. Use Imprimir / PDF.");return}
       var f=new File([b],"recibo-"+R.name.replace(/\s+/g,"-")+".png",{type:"image/png"});
