@@ -442,10 +442,13 @@ $("r_file").addEventListener("change",function(e){
   img.onload=function(){var c=document.createElement("canvas");c.width=c.height=96;var q=Math.min(img.width,img.height);c.getContext("2d").drawImage(img,(img.width-q)/2,(img.height-q)/2,q,q,0,0,96,96);rphoto=c.toDataURL("image/jpeg",.8);URL.revokeObjectURL(u);updR()};
   img.src=u;$("r_file").value="";
 });
-$("hello").textContent=(function(){
-  var d=new Date().toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-  return d.replace(/(^|\s)(\p{L})/gu,function(m,x,y){return x+y.toUpperCase()}).replace(/ De /g," de ");
-})();
+function tickHello(){
+  var n=new Date(),p=function(x){return String(x).padStart(2,"0")};
+  var d=n.toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  d=d.replace(/(^|\s)(\p{L})/gu,function(m,x,y){return x+y.toUpperCase()}).replace(/ De /g," de ");
+  $("hello").textContent=d+" · "+p(n.getHours())+":"+p(n.getMinutes())+":"+p(n.getSeconds());
+}
+tickHello();setInterval(tickHello,1000);
 
 /* ---------- comprovante ---------- */
 var attachOwner=null,gal={list:[],i:0,owner:null};
