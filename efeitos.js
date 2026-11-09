@@ -8,6 +8,7 @@
 "use strict";
 var d=document,root=d.documentElement,$=function(i){return d.getElementById(i)};
 var on=true;try{on=localStorage.getItem("dv-fx")!=="0"}catch(e){}
+var lite=!!(window.matchMedia&&matchMedia("(hover:none),(max-width:700px)").matches);
 var calm=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches);
 var mouse={x:-9999,y:-9999};
 addEventListener("pointermove",function(e){mouse.x=e.clientX;mouse.y=e.clientY},{passive:true});
@@ -24,7 +25,7 @@ function Field(cv,kind,density){
   if(!g)return {start:function(){},stop:function(){},size:function(){}};
   var ps=[],W=0,H=0,raf=0,t=0;
   function seed(){
-    var n=Math.max(12,Math.min(64,Math.round(W*H/density)));ps=[];
+    var n=Math.max(12,Math.min(lite?22:64,Math.round(W*H/density)));ps=[];
     for(var i=0;i<n;i++){
       var coin=Math.random()<.14;
       ps.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3-(coin?.12:0),
@@ -33,7 +34,7 @@ function Field(cv,kind,density){
     }
   }
   function size(){
-    var r=cv.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+    var r=cv.getBoundingClientRect(),dpr=lite?1:Math.min(2,window.devicePixelRatio||1);
     W=Math.round(r.width);H=Math.round(r.height);
     cv.width=W*dpr;cv.height=H*dpr;g.setTransform(dpr,0,0,dpr,0,0);seed();
   }
@@ -71,12 +72,12 @@ function Field(cv,kind,density){
         g.fillStyle="rgba("+p.dot+","+(p.dotA*(.65+.35*Math.sin(t*1.5+a.ph)))+")";g.beginPath();g.arc(a.x,a.y,a.r,0,6.283);g.fill();
       }
     }
-    if(!calm)raf=requestAnimationFrame(frame);
+    if(!calm)raf=requestAnimationFrame(lite?function(){setTimeout(frame,33)}:frame);
   }
   function start(){if(!raf&&on&&cv.offsetWidth)raf=requestAnimationFrame(frame)}
   function stop(){if(raf)cancelAnimationFrame(raf);raf=0;g.clearRect(0,0,W,H)}
-  addEventListener("resize",function(){if(on){size();start()}});
-  d.addEventListener("visibilitychange",function(){if(!d.hidden)start()});
+  var rz;addEventListener("resize",function(){clearTimeout(rz);rz=setTimeout(function(){if(on){size();start()}},200)});
+  d.addEventListener("visibilitychange",function(){if(d.hidden){if(raf)cancelAnimationFrame(raf);raf=0}else start()});
   size();
   return {start:start,stop:stop,size:size};
 }

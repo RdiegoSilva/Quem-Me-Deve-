@@ -24,7 +24,7 @@ function tick(){
   d=d.replace(/(^|\s)(\p{L})/gu,function(m,a,b){return a+b.toUpperCase()}).replace(/ De /g," de ");
   $("d_clk").textContent=d+" · "+pad(n.getHours())+":"+pad(n.getMinutes())+":"+pad(n.getSeconds());
 }
-setInterval(tick,1000);tick();
+setInterval(function(){if(!document.hidden)tick()},1000);tick();
 
 /* ---------- regras ---------- */
 function got(p){return p.paid?p.amount:Math.min(p.amount,p.got||0)}
@@ -55,8 +55,9 @@ async function candidates(id){
   return l;
 }
 async function tryLogin(id,pass){
-  id=QM.normId(id);var l=await candidates(id),best=null;
-  for(var i=0;i<l.length;i++){try{var d=await QM.open(l[i],pass,id);if(!best||(d.gen||"")>(best.d.gen||""))best={d:d,t:l[i]}}catch(e){}}
+  id=QM.normId(id);var l=(await candidates(id)).filter(function(x,i,a){return a.indexOf(x)===i}),best=null;
+  var R=await Promise.all(l.map(function(t){return QM.open(t,pass,id).then(function(d){return {d:d,t:t}},function(){return null})}));
+  R.forEach(function(x){if(x&&(!best||(x.d.gen||"")>(best.d.gen||"")))best=x});
   if(!best)return {err:l.length?"ID ou senha incorretos.":"Não encontrei o seu acesso. Peça o link atualizado para quem cobra."};
   LS.set("qmd-tk-"+id,best.t);
   return {d:best.d};
@@ -105,6 +106,7 @@ function render(){
   else if(st.k==="dia"&&nx)msg="Você está em dia neste mês. Próxima parcela: "+(nx.due?fdate(nx.due):monthName(nx.month))+" · "+brl(rem(nx))+".";
   else if(nx)msg="Sua parcela vence em "+(nx.due?fdate(nx.due):monthName(nx.month))+": "+brl(rem(nx))+".";
   $("d_nx").textContent=msg;
+  (function(){var pc=T>0?Math.max(0,Math.min(100,Math.round(G/T*100))):100;$("d_pct").textContent=pc+"% pago · falta "+brl(Math.round(R*100)/100);setTimeout(function(){$("d_bar").style.width=pc+"%"},80)})();
   $("d_pay").hidden=st.k==="quit";
   // dívidas
   var h=D.debts.map(function(d,di){
@@ -183,15 +185,15 @@ $("pgd").addEventListener("click",function(e){if(e.target===$("pgd"))$("pgd").cl
 
 /* ---------- baixar app ---------- */
 var ip=null,standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone,ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
-function instShow(v){document.querySelectorAll(".inst").forEach(function(b){b.hidden=!v})}
+function instShow(v){document.querySelectorAll(".inst").forEach(function(b){b.hidden=!v});var c=$("apx");if(c){var dis=LS.get("qmd-apx")==="1";c.hidden=!v||dis}}
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();ip=e;if(!standalone)instShow(true)});
 window.addEventListener("appinstalled",function(){ip=null;instShow(false);toast("App instalado!")});
-if(!standalone&&ios)instShow(true);
+instShow(!standalone);
 document.querySelectorAll(".inst").forEach(function(b){b.addEventListener("click",function(){
   if(ip){ip.prompt();ip.userChoice.then(function(){ip=null;instShow(false)},function(){})}
-  else if(ios)toast("No iPhone: toque em Compartilhar e depois em Adicionar à Tela de Início.");
-  else toast("Use o menu do navegador e escolha Instalar app ou Adicionar à tela inicial.");
+  else if($("instd"))$("instd").showModal();
 })});
+if($("apx_x"))$("apx_x").addEventListener("click",function(){LS.set("qmd-apx","1");$("apx").hidden=true});
 if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register("sw.js").catch(function(){})}
 
 /* ---------- início ---------- */

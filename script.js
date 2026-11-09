@@ -319,7 +319,7 @@ $("x_w").addEventListener("click",function(){snd("wa");window.open("https://wa.m
 $("x_i").addEventListener("click",function(){
   var s=stmt(xName),W=720,P=32,L=36,H=130,y=H+10;
   var rows=0;s.sec.forEach(function(x){if(x.r.length)rows+=x.r.length+1});
-  var cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=(H+rows*L+120)*sc;
+  var cv=document.createElement("canvas"),sc=Math.max(.6,Math.min(2,Math.sqrt(12e6/(W*(H+rows*L+120)))));cv.width=Math.round(W*sc);cv.height=Math.round((H+rows*L+120)*sc);
   var g=cv.getContext("2d");g.scale(sc,sc);
   g.fillStyle="#fff";g.fillRect(0,0,W,cv.height);
   var gr=g.createLinearGradient(0,0,W,H);gr.addColorStop(0,"#4a0988");gr.addColorStop(1,"#b13fe0");g.fillStyle=gr;g.fillRect(0,0,W,H);
@@ -1005,7 +1005,7 @@ $("rc_i").addEventListener("click",function(){
     var W=800,P=34,LH=30,x0=P+22,xr=W-P-22,H=300;
     R.debts.forEach(function(d){H+=192+d.parcels.length*LH+44+18});
     H+=110+70+(R.pays.length?44+R.pays.length*LH:0);
-    var cv=document.createElement("canvas"),sc=2;cv.width=W*sc;cv.height=H*sc;
+    var cv=document.createElement("canvas"),sc=Math.max(.6,Math.min(2,Math.sqrt(12e6/(W*H))));cv.width=Math.round(W*sc);cv.height=Math.round(H*sc);
     var g=cv.getContext("2d");g.scale(sc,sc);
     var fit=function(t,mw){while(g.measureText(t).width>mw&&t.length>4)t=t.slice(0,-2);return t};
     g.fillStyle="#fff";g.fillRect(0,0,W,H);
@@ -1054,8 +1054,8 @@ $("rc_i").addEventListener("click",function(){
     g.fillStyle="#0a1a45";g.textAlign="left";g.font="800 11px system-ui,sans-serif";g.fillText("TOTAL PAGO",x0,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tk),x0,y+66);
     g.textAlign="right";g.font="800 11px system-ui,sans-serif";g.fillText("FALTA PAGAR",xr,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tr),xr,y+66);
     g.textAlign="center";g.fillStyle="#6a79a8";g.font="12px system-ui,sans-serif";g.fillText("Este recibo confirma os pagamentos registrados até "+R.date+". Obrigado!",W/2,y+90+36);
-    cv.toBlob(function(b){
-      if(!b){toast("Não consegui gerar a imagem do recibo.");return}
+    var cb=function(b){
+      if(!b){if(ok){draw(false);return}toast("Não consegui gerar a imagem do recibo. Use Imprimir / PDF.");return}
       var f=new File([b],"recibo-"+R.name.replace(/\s+/g,"-")+".png",{type:"image/png"});
       var dg=$("recimg");
       if(!dg){
@@ -1071,7 +1071,8 @@ $("rc_i").addEventListener("click",function(){
       $("recimg_s").hidden=!(navigator.canShare&&navigator.canShare({files:[f]}));
       $("recimg_s").onclick=function(){navigator.share({files:[dg._f]}).catch(function(){})};
       if(!dg.open)dg.showModal();snd("ok");
-    });
+    };
+    try{cv.toBlob(cb,"image/png")}catch(e){if(ok)draw(false);else toast("Não consegui gerar a imagem do recibo. Use Imprimir / PDF.")}
   }
 });
 
@@ -1342,7 +1343,7 @@ function waMine(){return LS.get("dv-wa")||"88982293900"}
 function pixList(){return lsj("dv-pix",[])}
 function pixSave(a){LS.set("dv-pix",JSON.stringify(a))}
 function copyTxt(t,msg){
-  function fb(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}a.remove();toast(ok?msg:"Não consegui copiar. Copie manualmente.")}
+  function fb(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;top:0;left:0;opacity:0;font-size:16px";a.setAttribute("readonly","");document.body.appendChild(a);a.focus();a.select();a.setSelectionRange(0,a.value.length);var ok=false;try{ok=document.execCommand("copy")}catch(e){}a.remove();toast(ok?msg:"Não consegui copiar. Copie manualmente.")}
   if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(function(){toast(msg)},fb);else fb();
 }
 $("cfg_close").addEventListener("change",function(){var n=Math.max(1,Math.min(31,parseInt($("cfg_close").value)||10));$("cfg_close").value=n;LS.set("dv-close",String(n));toast("Cartão fecha dia "+n+".")});
@@ -1391,8 +1392,12 @@ function buildData(w){
 function accPw(){return lsj("dv-accpw",{})}
 function accTk(){return lsj("dv-acctk",{})}
 function noCrypto(){if(!(window.crypto&&crypto.subtle)){toast("Para criar o acesso, abra o site em https (hospedado) ou em localhost.");return true}return false}
-async function accMake(w,pw){
-  var d=buildData(w),code=d.person.code,t=await QM.seal(d,pw,code);
+var accBusy=null;
+async function accMake(w,pw,force){
+  var d=buildData(w),code=d.person.code,sig=pw+"|"+JSON.stringify({p:d.person,c:d.cfg,d:d.debts,y:d.pays});
+  var C=accTk()[code],S=lsj("dv-accsig",{});
+  if(!force&&C&&S[code]===sig&&accPw()[code]===pw)return {code:code,token:C,cached:true};
+  var t=await QM.seal(d,pw,code);S[code]=sig;LS.set("dv-accsig",JSON.stringify(S));
   var P=accPw(),T=accTk();P[code]=pw;T[code]=t;LS.set("dv-accpw",JSON.stringify(P));LS.set("dv-acctk",JSON.stringify(T));
   return {code:code,token:t};
 }
@@ -1412,15 +1417,21 @@ $("p_ac").addEventListener("click",async function(){
   if(!pw){pw=QM.genPass(6);$("p_pwd").value=pw}
     try{var r=await accMake(w,pw);accFill(w);$("p_am").textContent="Acesso pronto. ID "+r.code+" · senha "+pw+". Agora copie o link ou baixe o acessos.json.";snd("ok");render()}catch(e){toast("Erro ao criar acesso: "+e.message)}
 });
-async function accEnsure(){
+async function accEnsure(btn){
   var w=editName,pw=$("p_pwd").value.trim();
   if(noCrypto())return null;
   if(!pw){toast("Gere ou digite uma senha primeiro.");return null}
+  if(accBusy)return null;
+  var old=btn&&btn.textContent;accBusy=1;if(btn){btn.disabled=true;btn.textContent="⏳ Gerando…"}
+  await new Promise(function(r){setTimeout(r,30)});
   try{var r=await accMake(w,pw);accFill(w);return {code:r.code,token:r.token,pw:pw}}catch(e){toast("Erro: "+e.message);return null}
+  finally{accBusy=null;if(btn){btn.disabled=false;btn.textContent=old}}
 }
-$("p_al").addEventListener("click",async function(){var r=await accEnsure();if(!r)return;copyTxt(accLink(r.code,r.token),"Link copiado! Passe também o ID e a senha.")});
+function accText(r){var w=editName;return "Olá, "+w.split(" ")[0]+"! Seu acesso para ver suas dívidas:\n"+accLink(r.code,r.token)+"\n\nLogin (ID): "+r.code+"\nSenha: "+r.pw}
+$("p_al").addEventListener("click",async function(){var r=await accEnsure(this);if(!r)return;copyTxt(accLink(r.code,r.token),"Link copiado! Passe também o ID e a senha.")});
+$("p_aa").addEventListener("click",async function(){var r=await accEnsure(this);if(!r)return;copyTxt(accText(r),"Acesso copiado: link, login e senha!")});
 $("p_aw").addEventListener("click",async function(){
-  var r=await accEnsure();if(!r)return;var w=editName,num=waNum((people[w]||{}).phone);
+  var r=await accEnsure(this);if(!r)return;var w=editName,num=waNum((people[w]||{}).phone);
   var msg="Olá, "+w.split(" ")[0]+"! Seu acesso para ver suas dívidas:\n"+accLink(r.code,r.token)+"\n\nID: "+r.code+"\nSenha: "+r.pw;
   snd("wa");window.open("https://wa.me/"+num+"?text="+encodeURIComponent(msg),"_blank","noopener");
   if(!num)toast("Sem telefone salvo: escolha o contato no WhatsApp.");

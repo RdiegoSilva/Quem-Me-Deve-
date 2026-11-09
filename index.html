@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Quem Me Deve · Admin</title>
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#050b30">
+<meta name="theme-color" content="#0a0a0a">
 <script>try{var t=localStorage.getItem("dv-th");document.documentElement.dataset.theme=t===""?"light":(t||"dark")}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="logo.png">
@@ -15,8 +15,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=24">
-<link rel="stylesheet" href="tema.css?v=6">
+<link rel="stylesheet" href="style.css?v=25">
+<link rel="stylesheet" href="tema.css?v=7">
 </head>
 <body>
 <div class="app">
@@ -125,7 +125,7 @@
 <p class="s">O devedor entra em <b>devedor.html</b> com o ID <b id="p_aid">—</b> e a senha abaixo. Ele só vê as próprias dívidas e não consegue alterar nada.</p>
 <div class="fg"><div><label for="p_pwd">Senha do devedor</label><input id="p_pwd" type="text" placeholder="Qualquer senha que você quiser" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div style="align-self:end"><button class="sec" type="button" id="p_pg" style="width:100%">🎲 Gerar senha</button></div></div>
 <div class="ktools" style="margin-top:10px"><button class="sec" type="button" id="p_cp">📋 Copiar senha</button><button class="sec" type="button" id="p_sh">🙈 Ocultar senha</button></div>
-<div class="ktools" style="margin-top:8px"><button class="add" type="button" id="p_ac">Criar / atualizar acesso</button><button class="sec" type="button" id="p_al">🔗 Copiar link</button><button class="sec" type="button" id="p_aw">💬 Enviar acesso</button><button class="sec" type="button" id="p_ar">✏️ Alterar senha</button></div>
+<div class="ktools" style="margin-top:8px"><button class="add" type="button" id="p_ac">Criar / atualizar acesso</button><button class="add" type="button" id="p_aa">📋 Copiar acesso</button><button class="sec" type="button" id="p_al">🔗 Copiar link</button><button class="sec" type="button" id="p_aw">💬 Enviar acesso</button><button class="sec" type="button" id="p_ar">✏️ Alterar senha</button></div>
 <p class="s" id="p_am" style="margin-top:8px"></p>
 </details>
 <div class="full ktools"><button class="sec" type="button" id="p_pay">💵 Pagamento</button><button class="sec" type="button" id="p_n">＋ Nova dívida</button><button class="sec" type="button" id="p_w">💬 Cobrar</button><button class="sec" type="button" id="p_x">📄 Extrato</button><button class="sec" type="button" id="p_r">🧾 Recibo</button><button class="sec" type="button" id="p_q">✔ Quitar tudo</button></div>
@@ -143,7 +143,7 @@
 
 <dialog id="xd"><div id="x_b"></div>
 <div class="fg" style="margin-top:12px">
-<button class="add" id="x_w">Enviar no WhatsApp</button><button class="sec" id="x_i">Imagem</button>
+<button class="add" id="x_w">Enviar no WhatsApp</button><button class="sec" id="x_i">🖼 Extrato (imagem)</button>
 <button class="sec" id="x_c">Copiar texto</button><button class="sec" data-close="xd">Fechar</button>
 </div></dialog>
 
@@ -240,7 +240,7 @@
 <dialog id="recd"><label class="ck" id="rc_jw" hidden><input type="checkbox" id="rc_j"> Juntar todas as dívidas em um só quadro</label>
 <div id="rc_b"></div>
 <div class="fg rc-act">
-<button class="add" id="rc_w">Enviar no WhatsApp</button><button class="sec" id="rc_i">Imagem</button>
+<button class="add" id="rc_w">Enviar no WhatsApp</button><button class="sec" id="rc_i">🖼 Recibo (imagem)</button>
 <button class="sec" id="rc_c">Copiar texto</button><button class="sec" id="rc_p">Imprimir / PDF</button>
 <button class="sec full" data-close="recd">Fechar</button></div></dialog>
 
@@ -275,7 +275,7 @@
 <div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
 <canvas id="fxc" aria-hidden="true"></canvas>
 <script src="shared.js?v=22"></script>
-<script src="script.js?v=26"></script>
+<script src="script.js?v=28"></script>
 <script src="efeitos.js?v=22"></script>
 </body>
 </html>

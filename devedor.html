@@ -4,17 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Quem Me Deve · Área do devedor</title>
-<meta name="theme-color" content="#050b30">
+<meta name="theme-color" content="#0a0a0a">
 <script>try{var t=localStorage.getItem("dv-th");document.documentElement.dataset.theme=t===""?"light":(t||"dark")}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest-devedor.webmanifest">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=24">
-<link rel="stylesheet" href="devedor.css?v=24">
-<link rel="stylesheet" href="tema.css?v=6">
+<link rel="stylesheet" href="style.css?v=25">
+<link rel="stylesheet" href="devedor.css?v=25">
+<link rel="stylesheet" href="tema.css?v=7">
 </head>
 <body class="dvb">
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -32,7 +35,7 @@
 <button class="add big" type="submit" id="l_go">Entrar</button>
 <p class="err" id="l_err" role="alert"></p>
 <button type="button" class="lnk" id="l_forgot">Esqueci minha senha</button>
-<button type="button" class="sec inst" id="l_inst" hidden>📲 Baixar app</button>
+<button type="button" class="sec inst" id="l_inst"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg> Baixar o app</button>
 <p class="s foot">O ID e a senha são enviados por quem cobra. Só você consegue ver os seus dados.</p>
 </form>
 </div>
@@ -41,12 +44,13 @@
 <div id="app" hidden>
 <header class="dtop">
 <div class="brand"><img src="logo.png" alt=""><div><b id="d_hi">Olá</b><span class="s" id="d_id"></span></div></div>
-<div class="dclock"><span id="d_clk"></span><button class="tb-i inst" id="d_inst" title="Baixar o app" aria-label="Baixar app" hidden>📲</button><button class="tb-i" id="d_th" title="Trocar modo claro/noturno" aria-label="Trocar tema" onclick="var r=document.documentElement,l=r.dataset.theme!=='light';r.dataset.theme=l?'light':'dark';try{localStorage.setItem('dv-th',l?'':'dark')}catch(e){}this.textContent=l?'☾':'☀'">☀</button><button class="tb-i" id="d_print" title="Imprimir meu extrato" aria-label="Imprimir">🖨</button><button class="sec" id="d_out">Sair</button></div>
+<div class="dclock"><span id="d_clk"></span><button class="tb-i inst" id="d_inst" title="Baixar o app" aria-label="Baixar app"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></button><button class="tb-i" id="d_th" title="Trocar modo claro/noturno" aria-label="Trocar tema" onclick="var r=document.documentElement,l=r.dataset.theme!=='light';r.dataset.theme=l?'light':'dark';try{localStorage.setItem('dv-th',l?'':'dark')}catch(e){}this.textContent=l?'☾':'☀'">☀</button><button class="tb-i" id="d_print" title="Imprimir meu extrato" aria-label="Imprimir">🖨</button><button class="sec" id="d_out">Sair</button></div>
 </header>
 
 <main class="dmain">
+<div class="apx inst-card" id="apx" hidden><span class="apx-i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></span><div class="apx-t"><b>Baixe o app</b><span>Abra suas dívidas com 1 toque, direto da tela inicial.</span></div><button class="add inst" type="button" id="apx_b">Baixar</button><button class="apx-x" type="button" id="apx_x" aria-label="Fechar">×</button></div>
 <section class="dhero rise">
-<div><div class="s" id="d_stl">Situação</div><span class="st" id="d_st"></span><p class="dnx" id="d_nx"></p></div>
+<div class="dh-l"><div class="s" id="d_stl">Situação</div><span class="st" id="d_st"></span><p class="dnx" id="d_nx"></p><div class="dh-pg"><div><i id="d_bar"></i></div><small id="d_pct"></small></div></div>
 <button class="go" id="d_pay"><span class="gi">$</span> Pagar</button>
 </section>
 
@@ -76,10 +80,18 @@
 <button class="sec" data-close="pgd">Fechar</button>
 </div></dialog>
 
+<dialog id="instd"><div class="cs">
+<h2>📲 Baixar o app</h2>
+<div class="cg"><h3>iPhone (Safari)</h3><ol><li>Toque em <b>Compartilhar</b> (quadrado com seta).</li><li>Escolha <b>Adicionar à Tela de Início</b>.</li><li>Toque em <b>Adicionar</b>.</li></ol></div>
+<div class="cg"><h3>Android (Chrome)</h3><ol><li>Toque no menu <b>⋮</b> do navegador.</li><li>Escolha <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li><li>Confirme em <b>Instalar</b>.</li></ol></div>
+<p class="s">O site precisa estar aberto em https para instalar.</p>
+<button class="sec" data-close="instd">Entendi</button>
+</div></dialog>
+
 <div id="toast" role="status"><span id="tm"></span></div>
 <script src="qrcode.js"></script>
 <script src="shared.js?v=22"></script>
 <script src="efeitos.js?v=22"></script>
-<script src="devedor.js?v=25"></script>
+<script src="devedor.js?v=27"></script>
 </body>
 </html>

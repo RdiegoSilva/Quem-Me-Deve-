@@ -127,17 +127,6 @@ body.dvb{background:radial-gradient(900px 480px at 75% -6%,rgba(212,175,55,.14),
 :root[data-theme="light"] .hero{background:radial-gradient(520px 260px at 88% 40%,rgba(212,175,55,.3),transparent 70%),linear-gradient(120deg,#16120a,#000 75%)}
 @media(max-width:700px){.hero{padding:22px 20px}.hero-a{display:none}}
 
-/* telas de senha e PIN continuam azuis */
-.lgn,#lock{--bg:#050b30;--card:#0a1445;--tx:#eef2ff;--mu:#93a0d8;--bd:rgba(130,150,255,.17);--pr:#5a93ff;--pr2:#38bdf8;--on:#fff;
-  --nav1:#0a1260;--nav2:#050b30;--ok:#2bd46b;--pe:#ff5566;--shadow:0 1px 0 rgba(255,255,255,.04) inset,0 24px 48px -28px rgba(0,0,40,.9)}
-.lgn{background:radial-gradient(120% 90% at 50% 0%,#1b2bd0 0%,#0a1260 50%,#040824 100%)}
-.lc{border:1px solid rgba(130,150,255,.28);box-shadow:0 50px 110px -30px rgba(0,0,30,.9)}
-.lgl{filter:drop-shadow(0 18px 30px rgba(30,40,255,.55))}
-.lgn .add,#lock .add{background:linear-gradient(180deg,#31d65f,#12a940);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 14px 26px -12px #12a940}
-.lgn input,#lock input{background:color-mix(in srgb,#eef2ff 5%,transparent);border:1px solid rgba(130,150,255,.17);color:#eef2ff}
-.lgn input:focus,#lock input:focus{border-color:#5a93ff;box-shadow:0 0 0 4px rgba(90,147,255,.22)}
-.lgn .lnk{color:#5a93ff}
-
 /* ==========================================================
    Configurações organizadas (duas colunas, cartões com ícone)
    ========================================================== */
@@ -219,3 +208,91 @@ body.dvb .dmain{position:relative;z-index:1}
 body.dvb .dtop{z-index:20}
 .lgn{position:relative;z-index:1}
 .lc .inst{justify-self:center;border-radius:999px;padding:10px 20px}
+
+
+/* ==========================================================
+   Sem azul: login, PIN, janelas, avisos e caixas
+   ========================================================== */
+.lgn,#lock{--bg:#080808;--card:#141414;--tx:#f7f3e8;--mu:#a8a08a;--bd:rgba(212,175,55,.22);--pr:#f2c94c;--pr2:#d4af37;--on:#111;
+  --nav1:#111;--nav2:#000;--ok:#4ade80;--pe:#ff6b6b}
+.lgn{background:radial-gradient(110% 80% at 50% 0%,#2a2208 0%,#0d0d0d 55%,#000 100%)}
+#lock{background:radial-gradient(120% 80% at 50% 0%,#2a2208 0%,#0d0d0d 55%,#000 100%)}
+.lc{border:1px solid rgba(212,175,55,.35);box-shadow:0 50px 110px -30px rgba(0,0,0,.95),0 0 0 1px rgba(212,175,55,.06)}
+.lgl{filter:drop-shadow(0 18px 30px rgba(212,175,55,.4))}
+.lgn .add,#lock .add{background:linear-gradient(180deg,#f7d96b,#d4af37);color:#111;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 14px 26px -14px #d4af37}
+.lgn input,#lock input{background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.22);color:#f7f3e8}
+.lgn input:focus,#lock input:focus{border-color:#f2c94c;box-shadow:0 0 0 4px rgba(212,175,55,.2)}
+.lgn .lnk{color:#f2c94c}
+.pad button{background:rgba(255,255,255,.06);border:1px solid rgba(212,175,55,.3);color:#f7f3e8}
+.pad button:active{background:rgba(212,175,55,.25)}
+
+dialog{border:1px solid rgba(212,175,55,.3);box-shadow:0 50px 110px -30px rgba(0,0,0,.95)}
+dialog::backdrop{background:rgba(0,0,0,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+#toast{background:rgba(14,12,6,.96);border:1px solid rgba(212,175,55,.4);color:#f7f3e8}
+#selbar{border-color:rgba(212,175,55,.3)}
+.topbar.sc{box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
+.side{box-shadow:0 -10px 30px -10px rgba(0,0,0,.8)}
+.av{box-shadow:0 0 0 2px var(--card),0 0 0 3.5px rgba(212,175,55,.55)}
+.group:hover{border-color:rgba(212,175,55,.5)}
+.lk .s,.dtop .s{color:#cfc6a8}
+.ab-e{background:linear-gradient(180deg,#f7d96b,#d4af37);color:#111}
+.ph{background:linear-gradient(90deg,#1a1405,#0a0a0a);color:#f7f3e8;border-bottom:1px solid rgba(212,175,55,.28)}
+.ph h2{color:#f7f3e8}
+.psum .t{background:linear-gradient(120deg,#f7d96b,#d4af37);color:#111;border:0}
+.psum .t small{color:rgba(17,17,17,.75)}
+.psum .t input{background:rgba(255,255,255,.35);border:1.5px solid rgba(17,17,17,.3);color:#111}
+.psum .t input:focus{background:rgba(255,255,255,.55);border-color:#111}
+.pb i{background:linear-gradient(90deg,#d4af37,#f7d96b)}
+.pxqr svg{background:#fff}
+
+/* ==========================================================
+   Área do devedor — mais bonita + baixar app
+   ========================================================== */
+.dtop{padding:12px 22px}
+.dtop .brand img{width:48px;height:48px;border-radius:50%;box-shadow:0 0 0 2px rgba(212,175,55,.6),0 8px 20px -6px rgba(212,175,55,.5)}
+.dtop .brand b{font-size:18px;color:#fff}
+.dclock .tb-i svg{width:20px;height:20px}
+.dclock .inst{color:#111;background:linear-gradient(180deg,#f7d96b,#d4af37);border-color:#f2c94c;box-shadow:0 8px 18px -8px #d4af37}
+.dclock .inst:hover{filter:brightness(1.08)}
+#d_clk{color:#cfc6a8;font-size:13px}
+
+/* faixa de baixar o app */
+.apx{position:relative;display:grid;grid-template-columns:auto 1fr;gap:12px 14px;align-items:center;margin-bottom:16px;padding:16px 44px 16px 16px;border-radius:22px;
+  background:linear-gradient(120deg,rgba(212,175,55,.18),rgba(212,175,55,.05)),#0c0b07;border:1px solid rgba(212,175,55,.45);color:var(--tx)}
+.apx[hidden]{display:none}
+.apx-i{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:linear-gradient(180deg,#f7d96b,#d4af37);color:#111;box-shadow:0 10px 20px -10px #d4af37}
+.apx-i svg{width:24px;height:24px}
+.apx-t{line-height:1.35;min-width:0}
+.apx-t b{display:block;font-family:var(--fd);font-size:15px}
+.apx-t span{font-size:12.5px;color:var(--mu)}
+.apx .add{grid-column:1/-1;width:100%;padding:11px 18px;border-radius:999px;font-size:15px;display:flex;justify-content:center}
+.apx-x{position:absolute;top:8px;right:8px;background:none;color:var(--mu);font-size:22px;line-height:1;padding:4px 10px;border-radius:10px;min-width:0;width:auto;height:auto}
+@media(min-width:640px){.apx{grid-template-columns:auto 1fr auto}.apx .add{grid-column:auto;width:auto;padding:11px 26px}}
+
+/* botão de baixar no login */
+.lc .inst{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;border:1px solid rgba(212,175,55,.5);background:rgba(212,175,55,.1);color:#f2c94c;font-weight:700}
+.lc .inst[hidden]{display:none}
+.lc .inst svg{width:18px;height:18px}
+
+/* herói com progresso */
+.dhero{background:radial-gradient(420px 220px at 92% 10%,rgba(212,175,55,.28),transparent 70%),linear-gradient(120deg,#17120a,#000 75%)}
+.dh-l{flex:1;min-width:230px}
+.dh-pg{margin-top:14px;max-width:420px}
+.dh-pg>div{height:10px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.dh-pg i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#d4af37,#f7d96b);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.dh-pg small{display:block;margin-top:6px;font-size:12.5px;color:#cfc6a8;font-weight:600}
+.dhero .go{box-shadow:0 18px 34px -14px #d4af37,inset 0 1px 0 rgba(255,255,255,.55)}
+.dmain .panel .ph{background:linear-gradient(90deg,rgba(212,175,55,.14),transparent)}
+.dmain .panel .ph h2{display:flex;align-items:center;gap:8px}
+.dbt{transition:transform .2s,border-color .25s,box-shadow .3s}
+.dbt[open]{border-color:rgba(212,175,55,.45)}
+.dr b{color:var(--tx)}
+:root[data-theme="light"] .dtop{background:rgba(0,0,0,.9)}
+:root[data-theme="light"] .dhero{color:#f7f3e8}
+:root[data-theme="light"] .apx{color:#141414;background:linear-gradient(120deg,#fff6d6,#fffdf2)}
+:root[data-theme="light"] .lgn{background:radial-gradient(110% 80% at 50% 0%,#2a2208 0%,#0d0d0d 55%,#000 100%)}
+
+/* janela "como instalar" */
+#instd .cs{display:grid;gap:14px}
+#instd ol{margin:0;padding-left:22px;display:grid;gap:8px;line-height:1.5}
+#instd .cg{padding:14px 16px;border:1px solid var(--bd);border-radius:18px;background:color-mix(in srgb,var(--tx) 4%,transparent)}

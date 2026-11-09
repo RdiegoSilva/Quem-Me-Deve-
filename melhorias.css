@@ -1,0 +1,297 @@
+/* ==========================================================
+   Quem Me Deve · melhorias.css
+   Camada final de acabamento. Carregue DEPOIS de style.css,
+   devedor.css e tema.css. Para desligar, tire a linha <link>.
+
+   Índice
+   01 Tokens (espaços, raios, curvas, tipografia fluida)
+   02 Base (fontes, rolagem, seleção, toque)
+   03 Compatibilidade iOS e Android
+   04 Animações de entrada e microinterações
+   05 Botões, campos e foco
+   06 Menu superior (PC) e menu inferior (celular)
+   07 Cartões do resumo, hero e painéis
+   08 Tabela e cards de pessoas
+   09 Janelas (dialog) e avisos
+   10 Área do devedor
+   11 Responsivo: tablet, celular, telas grandes
+   12 Preferências do sistema (menos movimento, impressão)
+   ========================================================== */
+
+/* 01 · Tokens */
+:root{
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--sp-6:32px;
+  --rd-s:12px;--rd-m:18px;--rd-l:26px;--rd-pill:999px;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --t-fast:.18s;--t-med:.32s;--t-slow:.6s;
+  --fs-xs:clamp(11px,.7vw + 9px,12.5px);
+  --fs-s:clamp(12.5px,.6vw + 11px,14px);
+  --fs-m:clamp(14px,.5vw + 13px,16px);
+  --fs-l:clamp(17px,1vw + 14px,21px);
+  --fs-xl:clamp(21px,2vw + 14px,30px);
+  --fs-hero:clamp(32px,5vw + 8px,58px);
+  --tap:44px;
+  --vh:100dvh;
+}
+
+/* 02 · Base */
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{
+  font-family:"Manrope","Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"SF Pro Text",Roboto,sans-serif;
+  font-size:var(--fs-m);
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+}
+h1,h2,h3,.gn,.xh{font-family:"Poppins","Manrope",system-ui,sans-serif;text-wrap:balance}
+p,.s{text-wrap:pretty}
+b,strong,.kpi b,.tw td.v,.tw td.r,.amt{font-variant-numeric:tabular-nums}
+img,svg,canvas{max-width:100%}
+::selection{background:rgba(242,201,76,.35);color:inherit}
+:focus-visible{outline:2px solid var(--pr);outline-offset:2px}
+*{scrollbar-width:thin;scrollbar-color:rgba(212,175,55,.45) transparent}
+::-webkit-scrollbar-thumb{background:rgba(212,175,55,.4);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:rgba(212,175,55,.7)}
+
+/* 03 · iOS e Android */
+/* iOS dá zoom em campos com fonte menor que 16px */
+input,select,textarea{font-size:16px;-webkit-appearance:none;appearance:none;touch-action:manipulation}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--mu) 50%),linear-gradient(135deg,var(--mu) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+input[type=checkbox]{-webkit-appearance:auto;appearance:auto}
+input[type=date],input[type=time]{min-height:46px}
+button,.nv,.tb-i,.ab{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.app,.lgn,#lock{min-height:100vh;min-height:var(--vh)}
+.side{height:100vh;height:var(--vh)}
+/* notch e barra de gestos */
+.topbar{padding-left:max(30px,env(safe-area-inset-left));padding-right:max(30px,env(safe-area-inset-right))}
+.dtop{padding-top:max(14px,env(safe-area-inset-top))}
+.dmain{padding-bottom:max(70px,calc(40px + env(safe-area-inset-bottom)))}
+dialog{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.tw{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+/* blur com prefixo para Safari */
+.topbar,.side,.dtop,#toast,#selbar,.sb-tip,.feats{-webkit-backdrop-filter:blur(14px) saturate(140%)}
+
+/* 04 · Animações */
+@keyframes qm-fade-up{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes qm-pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes qm-gold-shimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes qm-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(1deg)}}
+@keyframes qm-glow{0%,100%{box-shadow:0 0 0 0 rgba(242,201,76,.0),var(--glow)}50%{box-shadow:0 0 0 6px rgba(242,201,76,.08),var(--glow)}}
+@keyframes qm-coin{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+.rise,#v_home>*,#v_rep>*{animation:qm-fade-up var(--t-slow) var(--ease-out) both}
+.kpis .kpi:nth-child(1){animation-delay:.05s}
+.kpis .kpi:nth-child(2){animation-delay:.12s}
+.kpis .kpi:nth-child(3){animation-delay:.19s}
+.kpis .kpi:nth-child(4){animation-delay:.26s}
+.hero{animation:qm-fade-up .7s var(--ease-out) both,qm-glow 6s ease-in-out 1s infinite}
+.hero h1 em{background:linear-gradient(90deg,#f2c94c,#fff3b0,#d4af37,#f2c94c);background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;animation:qm-gold-shimmer 5s linear infinite}
+.hero-a i{animation:qm-coin 4s ease-in-out infinite}
+.hero-a i:nth-child(2n){animation-delay:.4s}
+.hero-a i:nth-child(3n){animation-delay:.8s}
+.lgl,.sb-logo img{animation:qm-float 6s ease-in-out infinite}
+.tw tr.gr{animation:qm-fade-up .5s var(--ease-out) both}
+dialog[open]{animation:qm-pop .3s var(--ease-spring)}
+.kpi,.group,.dbt,.panel,.pxk{transition:transform var(--t-med) var(--ease-out),box-shadow var(--t-med),border-color var(--t-med)}
+.group:hover,.dbt:hover{transform:translateY(-2px)}
+.kpi b{transition:transform var(--t-med) var(--ease-spring)}
+.kpi:hover b{transform:scale(1.04)}
+
+/* 05 · Botões, campos e foco */
+button{min-height:36px}
+.add,.go,.sec,.tg,.pcs{min-height:var(--tap)}
+.add,.go{background-size:200% auto}
+.add:active,.go:active,.sec:active{transform:scale(.96)}
+.add,.go,.sec{border-radius:var(--rd-pill)}
+.sec{padding-inline:18px}
+.pcs{min-height:32px}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(212,175,55,.22)}
+label{font-size:var(--fs-s)}
+.pb i{transition:width .8s var(--ease-out)}
+
+/* 06 · Menu superior (PC) e inferior (celular) */
+@media(min-width:901px){
+  .side{box-shadow:0 12px 30px -20px #000}
+  .nv{position:relative;transition:background var(--t-fast),color var(--t-fast),transform var(--t-fast)}
+  .nv:hover{transform:translateY(-1px)}
+  .nv.on::after{content:"";position:absolute;left:18px;right:18px;bottom:3px;height:2px;border-radius:2px;background:rgba(17,17,17,.35)}
+  .nav{overflow-x:auto;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+}
+@media(max-width:900px){
+  .side{
+    background:rgba(8,8,8,.92)!important;border-top:1px solid rgba(212,175,55,.3);border-right:0;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)
+  }
+  .nv{min-height:52px;border-radius:14px;color:#cfc6a8}
+  .nv.on{color:#111;transform:translateY(-3px)}
+  .nv span{font-size:10.5px;font-weight:700}
+  #sair{display:none}
+  .topbar{padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top))}
+  .tdate{font-size:var(--fs-xs);min-width:0}
+  .tdate svg{display:none}
+  .tact{gap:6px}
+  .tb-i{width:42px;height:42px}
+  .tsep,.avatar{display:none}
+}
+
+/* 07 · Resumo, hero e painéis */
+.hero{border-radius:var(--rd-l)}
+.hero h1{font-size:var(--fs-hero)}
+.hero p{font-size:var(--fs-l)}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.kpi b{font-size:var(--fs-xl);word-break:keep-all}
+.kpi small{font-size:var(--fs-m)}
+.panel,.group,.dash,.rec{border-radius:var(--rd-l)}
+.ph{gap:var(--sp-3)}
+.ph h2{font-size:var(--fs-xl)}
+.pf{gap:var(--sp-2)}
+.acts{align-items:stretch}
+.feats{border-radius:var(--rd-m)}
+
+/* 08 · Tabela e cards */
+.tw{border-radius:0 0 var(--rd-l) var(--rd-l)}
+.tw th{position:sticky;top:0;z-index:1;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:color-mix(in srgb,var(--card) 92%,transparent)}
+.tw tr.gr{transition:background var(--t-fast),transform var(--t-fast)}
+.tw tr.gr:hover{transform:scale(1.002)}
+.ab{transition:transform var(--t-fast) var(--ease-spring),filter var(--t-fast)}
+.ab:active{transform:scale(.92)}
+.st{letter-spacing:.01em}
+.av{transition:transform var(--t-med) var(--ease-spring)}
+tr.gr:hover .av,.group:hover .av{transform:scale(1.08)}
+.it{min-height:var(--tap)}
+
+/* 09 · Janelas e avisos */
+dialog{max-height:92vh;max-height:92dvh}
+dialog::backdrop{-webkit-backdrop-filter:blur(8px)}
+#toast{max-width:min(92vw,520px);padding-bottom:calc(11px + env(safe-area-inset-bottom))}
+#toast.on{animation:qm-pop .35s var(--ease-spring)}
+
+/* 10 · Área do devedor */
+.lc{width:min(420px,100%);border-radius:var(--rd-l)}
+.lc h1{font-size:var(--fs-xl)}
+.dhero{border-radius:var(--rd-l)}
+.dhero .go{min-height:var(--tap)}
+.dbt{border-radius:var(--rd-m)}
+.dbt>summary{min-height:var(--tap);-webkit-tap-highlight-color:transparent}
+.dbt[open]{border-color:rgba(212,175,55,.5)}
+.dbt[open] .chev{transform:rotate(0)}
+.dbt .rows{animation:qm-fade-up .35s var(--ease-out) both}
+.dr{transition:background var(--t-fast)}
+.pxqr svg{width:min(100%,240px);height:auto}
+.pxcode{font-size:12px}
+
+/* 11 · Responsivo */
+@media(min-width:1600px){
+  .page{max-width:1600px}
+  .kpis{gap:22px}
+}
+@media(max-width:1180px){
+  .acts{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .hero{padding:24px 20px;min-height:0}
+  .hero-b{width:100%;justify-content:center}
+  .kpis{grid-template-columns:1fr 1fr;gap:12px}
+  .kpi{padding:14px;min-height:112px}
+  .kpi b{font-size:clamp(18px,5.6vw,24px)}
+  .ki svg{width:34px;height:34px}
+  .ph{padding:14px 16px}
+  .ph h2{font-size:20px}
+  .search{width:100%}
+  .pf{padding:10px 14px}
+  .pf select{flex:1 1 45%}
+  .pf .seg{width:100%;display:flex}
+  .pf .seg button{flex:1}
+  .pfb{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pfb .add{grid-column:1/-1}
+  /* tabela vira lista de cartões no celular */
+  .tw table{min-width:0;display:block}
+  .tw thead{display:none}
+  .tw tbody,.tw tfoot{display:block}
+  .tw tr.gr{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;padding:14px 16px;border-bottom:1px solid var(--bd)}
+  .tw tr.gr td{display:block;border:0;padding:0;text-align:left}
+  .tw tr.gr td.n{grid-column:1/-1;font-size:var(--fs-l)}
+  .tw tr.gr td.dsc,.tw tr.gr td:nth-child(2){grid-column:1/-1}
+  .tw tr.gr td.ac{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .tw tr.gr td.ac .ab{width:44px;height:44px;margin:0}
+  .tw tr.gr td::before{display:block;font-size:10.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+  .tw tr.gr td.v::before{content:"Total"}
+  .tw tr.gr td.r::before{content:"Restante"}
+  .tw tr.gr td:nth-child(4)::before{content:"Parcelas"}
+  .tw tr.gr td:nth-child(5)::before{content:"Já pago"}
+  .tw tr.gr td:nth-child(7)::before{content:"Vencimento"}
+  .tw tfoot tr{display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px}
+  .tw tfoot td{display:block;padding:0;border:0;background:none}
+  .tw td small,.tw td.dsc small{max-width:none}
+  .dash{gap:18px;padding:18px}
+  .cols{height:180px}
+  .dhero{padding:20px 18px}
+  .dhero .st{font-size:13px}
+  .dmain .kpis{grid-template-columns:1fr 1fr}
+  .dbt>summary{padding:14px}
+  .dr{grid-template-columns:48px 1fr auto}
+  .dr .stp{grid-column:1/-1;justify-self:start}
+}
+@media(max-width:380px){
+  .kpis,.dmain .kpis{grid-template-columns:1fr}
+  .nv span{font-size:9.5px}
+}
+/* celular deitado */
+@media(max-height:480px) and (orientation:landscape){
+  .side{padding-block:2px}
+  .nv{min-height:40px;flex-direction:row;gap:6px}
+  dialog{max-height:96dvh}
+}
+/* dispositivos sem mouse: sem efeitos de hover que "grudam" */
+@media(hover:none){
+  .group:hover,.dbt:hover,.kpi:hover,.tw tr.gr:hover{transform:none}
+  .add:hover,.go:hover,.ab:hover{transform:none;filter:none}
+}
+
+/* 12 · Preferências do sistema */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+@media print{
+  .side,.topbar,#fx,#fx2,#fxc,#toast,#selbar{display:none!important}
+  body,.page,.mainc{background:#fff!important}
+}
+
+/* ==========================================================
+   13 · Leitura no celular — nada cortado, tudo legível
+   ========================================================== */
+@media(max-width:700px){
+  .tw td small,.dsc small,.pob,.dt .s,.pf,.rc-p,.xr,.dr,.pyr,.br,.ph-row,.hr,.tw td,.tw th{
+    white-space:normal!important;text-overflow:clip!important;overflow:visible!important;
+    overflow-wrap:anywhere;word-break:normal;max-width:none!important;min-width:0
+  }
+  .rc-p,.xr,.dr,.pyr,.br,.ph-row,.hr{flex-wrap:wrap;height:auto!important}
+  .br>:first-child{min-width:0;width:auto!important;flex:0 0 auto}
+  main,.wrap,.card,section{max-width:100%;overflow-x:clip}
+  img,canvas,svg,video{max-width:100%;height:auto}
+  dialog{width:100vw!important;max-width:100vw!important;max-height:92dvh!important;margin:auto 0 0 0!important;
+    border-radius:20px 20px 0 0!important;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+  dialog .fg{flex-wrap:wrap}
+  dialog .fg>*{flex:1 1 140px}
+  #recimg img,#recimg_i{max-width:100%;height:auto}
+}
+
+/* ==========================================================
+   14 · Desempenho no celular — sem travadas
+   ========================================================== */
+@media(hover:none),(max-width:900px){
+  .hero,.hero h1 em,.hero-a i,.lgl,.sb-logo img,.dhero::before,.banner::after,.pb i::after{animation:none!important}
+  .topbar,.side,.dtop,#toast,#selbar,.sb-tip,.feats,.pad button,.tw th,dialog::backdrop{
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  .topbar,.dtop{background:rgba(8,8,8,.96)!important}
+  #toast,#selbar{background:#111!important}
+  .priv .tw tfoot td+td,.priv :is(.pgsum b,.ph-row>div>b,.rc-pays b){filter:blur(5px)}
+  *{-webkit-tap-highlight-color:transparent}
+  .tw,main,dialog{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .card,.kpi,.mot,.it{contain:layout paint;will-change:auto}
+  dialog::backdrop{background:rgba(0,0,0,.82)!important}
+}
