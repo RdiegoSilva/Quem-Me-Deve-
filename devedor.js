@@ -82,6 +82,7 @@ $("l_forgot").addEventListener("click",function(){
   window.open("https://wa.me/"+waNum()+"?text="+encodeURIComponent(t),"_blank","noopener");
 });
 $("d_out").addEventListener("click",function(){SS.del("qmd-s");D=null;$("app").hidden=true;$("login").hidden=false;$("l_pw").value="";$("l_err").textContent=""});
+$("l_eye").addEventListener("click",function(){var i=$("l_pw"),h=i.type==="password";i.type=h?"text":"password";$("l_eye").textContent=h?"🙈":"👁";$("l_eye").setAttribute("aria-label",h?"Ocultar senha":"Mostrar senha");i.focus()});
 $("d_print").addEventListener("click",function(){window.print()});
 window.addEventListener("beforeprint",function(){document.querySelectorAll("details.dbt").forEach(function(d){d.open=true})});
 

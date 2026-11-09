@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quem Me Deve · Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#050b30">
+<script>try{var t=localStorage.getItem("dv-th");document.documentElement.dataset.theme=t===""?"light":(t||"dark")}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Quem Me Deve">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=24">
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<canvas id="fx2" aria-hidden="true"></canvas>
+<div class="sb-logo"><img src="logo.png" alt="Quem Me Deve"></div>
+<nav class="nav" aria-label="Menu">
+<button class="nv on" data-nv="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></button>
+<button class="nv" data-nv="nova"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span>Nova Dívida</span></button>
+<button class="nv" data-nv="minhas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Minhas Dívidas</span></button>
+<button class="nv" data-nv="rel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 20V10M12 20V4M6 20v-6"/></svg><span>Relatórios</span></button>
+<button class="nv" id="cfg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Configurações</span></button>
+<button class="nv" id="sair"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Sair</span></button>
+</nav>
+<div class="sb-tip"><svg viewBox="0 0 24 24" fill="none" stroke="#ffc61a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="#ffc61a" fill-opacity=".25"/></svg>Organize suas dívidas e tenha mais tranquilidade!</div>
+<div class="sb-art" aria-hidden="true"></div>
+</aside>
+
+<div class="mainc">
+<header class="topbar">
+<span class="tdate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg><span id="hello"></span></span>
+<div class="tact"><button class="tb-i" id="priv" title="Modo privacidade: esconder valores" aria-label="Modo privacidade"></button><button class="tb-i" id="qpay" title="Recebi um pagamento" aria-label="Recebi um pagamento">💵</button><button class="tb-i" id="rkb" title="Ranking de pagadores" aria-label="Ranking">🏆</button><button class="tb-i" id="tb" title="Lixeira" aria-label="Lixeira">🗑 <span class="bn" id="bn" hidden>0</span></button><span class="tsep"></span><button class="avatar" id="usr" title="Configurações" aria-label="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></button></div>
+</header>
+
+<main class="page">
+<canvas id="fx" aria-hidden="true"></canvas>
+<section id="v_home">
+<div class="banner rise"><img src="banner.webp" alt="Quem Me Deve? Controle suas dívidas de forma simples e eficiente!"></div>
+
+<div class="kpis">
+<div class="kpi k1 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-5a2 2 0 0 1 0-4z"/></svg></span><div><small>Total Devido</small><b id="tt">R$ 0,00</b><em id="ktn"></em></div></div>
+<div class="kpi k2 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-width="3"/></svg></span><div><small>Já Pago</small><b id="tk">R$ 0,00</b><em id="kkn"></em></div></div>
+<div class="kpi k3 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><small>Ainda Deve</small><b id="tp">R$ 0,00</b><em id="kpn"></em></div></div>
+<div class="kpi k4 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg></span><div><small>Parcelas Pendentes</small><b id="kpp">0</b><em>em aberto</em></div></div>
+</div>
+
+<section class="panel rise" id="minhas">
+<div class="ph"><h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> Minhas Dívidas <span class="s" id="cnt"></span></h2>
+<label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar por nome..." aria-label="Buscar"></label></div>
+<div class="pf"><select id="fm" aria-label="Mês"></select><select id="fp" aria-label="Pessoa"></select><select id="fs" aria-label="Situação"><option value="">Todas</option><option value="0">Pendentes</option><option value="1">Pagas</option></select>
+<div class="seg" id="jseg" role="group" aria-label="Como mostrar as dívidas"><button type="button" data-j="0" class="on" title="Uma linha para cada dívida">Separadas</button><button type="button" data-j="1" title="Uma linha para cada pessoa, somando tudo">Juntar por pessoa</button></div>
+<div class="pfb"><button class="add" id="qpay2" type="button">💵 Recebi um pagamento</button><button class="sec" id="expb">⇣ Abrir tudo</button><button class="sec" id="vw">☰ Cards</button><button class="sec" id="selb">☑ Selecionar</button></div></div>
+<div id="list"></div>
+</section>
+
+<div class="acts">
+<button class="go" id="rg"><span class="gi">+</span> Nova Dívida</button>
+<div class="feats">
+<div class="ft"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.2-8 11-4.6-1.8-8-6-8-11V5z" fill="#22c55e"/><path d="M8 12l3 3 5-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Seus dados<br>protegidos</span></div>
+<div class="ft"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="#8b5cff"/></svg><span>Acesso rápido<br>e fácil</span></div>
+<div class="ft"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="12" width="4" height="9" rx="1" fill="#ffc61a"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#ffc61a"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#ffc61a"/></svg><span>Controle total<br>das suas dívidas</span></div>
+<div class="ft"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#3b82f6"/></svg><span>Mais organização<br>para sua vida</span></div>
+</div>
+</div>
+</section>
+
+<section id="v_rep" hidden>
+<div class="rph"><h2>Relatórios</h2><button class="sec" id="rkb2">🏆 Ranking de pagadores</button></div>
+<section class="dash rise">
+<div class="dn e" id="dn"><i><span id="pct">0%</span></i></div>
+<div class="panels">
+<div class="bars"><h3>Pendente por pessoa</h3><div id="bp"></div></div>
+<div class="bars"><h3>Pendente por origem</h3><div id="bo"></div></div>
+<div class="bars"><h3>Por mês</h3><div id="bm"></div></div>
+</div>
+<div class="lg"><u style="background:var(--ok)"></u>pago <u style="background:var(--pe);margin-left:12px"></u>pendente · o círculo mostra a % paga</div>
+</section>
+<section class="rec rise">
+<div class="sh"><h2>Recebimentos por mês</h2><span class="s" id="rtot"></span></div>
+<div class="cols" id="rc"></div>
+<p class="s" style="margin:12px 0 0">Conta o valor pelo mês em que a dívida foi marcada como paga. Segue o filtro de pessoa. Pagamentos parciais ainda não entram.</p>
+</section>
+</section>
+
+<span hidden><b id="h_p"></b><b id="h_n"></b><b id="h_k"></b></span>
+</main>
+</div>
+</div>
+
+
+<dialog id="ed"><form class="fg" id="ef">
+<h2 class="full">Editar dívida</h2>
+<div class="full"><label for="e_desc">Descrição</label><input id="e_desc" required></div>
+<div><label for="e_who">Nome</label><input id="e_who" list="ppl" required></div>
+<div><label for="e_cat">Origem</label><input id="e_cat" list="cats"></div>
+<div><label for="e_val">Valor total (R$)</label><input id="e_val" type="number" step="0.01" required></div>
+<div><label for="e_got">Já pagou (R$)</label><input id="e_got" type="number" step="0.01" min="0"></div>
+<div class="full"><label for="e_mon">Data da dívida</label><input id="e_mon" type="date" required></div>
+<div class="full fg" id="e_pw" hidden><div><label for="e_pa">Data em que pagou</label><input id="e_pa" type="date"></div><div><label for="e_pt">Hora</label><input id="e_pt" type="time"></div></div>
+<div class="full"><label for="e_note">Observação</label><input id="e_note"></div>
+<label class="full ck" id="e_allw" hidden><input type="checkbox" id="e_all" checked> Aplicar nome, pessoa e origem às <b id="e_n"></b> parcelas</label>
+<div class="full" id="e_h"></div>
+<button class="sec" type="button" data-close="ed">Cancelar</button><button class="add" type="submit">Salvar</button>
+</form></dialog>
+
+<dialog id="pd"><form class="fg" id="pf">
+<h2 class="full">⚙ Dados da pessoa</h2>
+<div class="full psum" id="p_sum"></div>
+<p class="s full" id="p_hint">Mudar o total ajusta o valor das dívidas pendentes, na mesma proporção. O que já foi pago não muda.</p>
+<div class="full pr"><span id="p_av"></span><div><button class="sec" type="button" id="p_pick">Escolher foto</button> <button class="sec" type="button" id="p_rm">Remover</button></div><input id="p_file" type="file" accept="image/*" hidden></div>
+<div class="full"><label for="p_name">Nome</label><input id="p_name" required></div>
+<div class="full"><label for="p_code">Código / ID da pessoa</label><input id="p_code" placeholder="Ex.: C001" autocomplete="off"></div>
+<div class="full"><label for="p_obs">Observação sobre a pessoa (só você vê)</label><input id="p_obs" placeholder="Ex.: paga sempre no dia 5, prefere Pix"></div>
+<div class="full"><label for="p_phone">WhatsApp (com DDD)</label><input id="p_phone" type="tel" inputmode="tel" placeholder="Ex.: 85 99999-9999"></div>
+<details class="full acc" id="p_acc"><summary>🔐 Acesso do devedor (login e senha)</summary>
+<p class="s">O devedor entra em <b>devedor.html</b> com o ID <b id="p_aid">—</b> e a senha abaixo. Ele só vê as próprias dívidas e não consegue alterar nada.</p>
+<div class="fg"><div><label for="p_pwd">Senha do devedor</label><input id="p_pwd" type="text" placeholder="Qualquer senha que você quiser" autocomplete="off" autocapitalize="off" spellcheck="false"></div><div style="align-self:end"><button class="sec" type="button" id="p_pg" style="width:100%">🎲 Gerar senha</button></div></div>
+<div class="ktools" style="margin-top:10px"><button class="sec" type="button" id="p_cp">📋 Copiar senha</button><button class="sec" type="button" id="p_sh">🙈 Ocultar senha</button></div>
+<div class="ktools" style="margin-top:8px"><button class="add" type="button" id="p_ac">Criar / atualizar acesso</button><button class="sec" type="button" id="p_al">🔗 Copiar link</button><button class="sec" type="button" id="p_aw">💬 Enviar acesso</button><button class="sec" type="button" id="p_ar">✏️ Alterar senha</button></div>
+<p class="s" id="p_am" style="margin-top:8px"></p>
+</details>
+<div class="full ktools"><button class="sec" type="button" id="p_pay">💵 Pagamento</button><button class="sec" type="button" id="p_n">＋ Nova dívida</button><button class="sec" type="button" id="p_w">💬 Cobrar</button><button class="sec" type="button" id="p_x">📄 Extrato</button><button class="sec" type="button" id="p_r">🧾 Recibo</button><button class="sec" type="button" id="p_q">✔ Quitar tudo</button></div>
+<button class="sec" type="button" data-close="pd">Cancelar</button><button class="add" type="submit">Salvar</button>
+</form></dialog>
+
+<dialog id="kd"><form class="fg" id="kf">
+<h2 class="full">Parcelas</h2>
+<p class="s full" id="k_t"></p>
+<div class="full" id="k_l"></div>
+<div class="full ktools"><button class="sec" type="button" id="k_pay">💵 Pagamento</button><button class="sec" type="button" id="k_n">＋ Outra dívida</button><button class="sec" type="button" id="k_w">💬 Cobrar</button><button class="sec" type="button" id="k_x">📄 Extrato</button><button class="sec" type="button" id="k_rc">🧾 Recibo</button><button class="sec" type="button" id="k_g">⚙ Dívida</button><button class="sec" type="button" id="k_p">👤 Pessoa</button></div>
+<button class="sec full" type="button" id="k_all">Marcar todas como pagas</button>
+<button class="sec" type="button" data-close="kd">Cancelar</button><button class="add" type="submit">Salvar</button>
+</form></dialog>
+
+<dialog id="xd"><div id="x_b"></div>
+<div class="fg" style="margin-top:12px">
+<button class="add" id="x_w">Enviar no WhatsApp</button><button class="sec" id="x_i">Imagem</button>
+<button class="sec" id="x_c">Copiar texto</button><button class="sec" data-close="xd">Fechar</button>
+</div></dialog>
+
+<dialog id="vd"><div class="s" id="v_c" style="margin-bottom:6px"></div>
+<img id="v_img" alt="Comprovante" style="width:100%;border-radius:14px;max-height:58vh;object-fit:contain;background:var(--bg)">
+<div id="v_th" class="thumbs"></div>
+<div class="fg" style="margin-top:12px"><button class="sec" id="v_dl">Baixar</button><button class="sec" id="v_re">＋ Adicionar</button><button class="sec" id="v_rm">Remover esta</button><button class="add" data-close="vd">Fechar</button></div></dialog>
+<input id="pfile" type="file" accept="image/*" multiple hidden>
+
+<dialog id="td"><h2>🗑 Lixeira</h2><p class="s">Itens apagados ficam aqui por 30 dias e podem ser restaurados.</p>
+<div id="t_l"></div>
+<div class="fg" style="margin-top:12px"><button class="sec" id="t_e">Esvaziar lixeira</button><button class="add" data-close="td">Fechar</button></div></dialog>
+
+<button class="fab" id="fab" aria-label="Nova dívida">+</button>
+
+<dialog id="rd"><form id="f">
+<h2 class="full">Registrar dívidas</h2>
+<div class="full pr"><span id="r_av"></span><div><button class="sec" type="button" id="r_pick">Foto da pessoa</button></div><input id="r_file" type="file" accept="image/*" hidden></div>
+<div><label for="who">Nome</label><input id="who" list="ppl" required placeholder="Ex.: Maria" autocomplete="off"><datalist id="ppl"></datalist></div>
+<div><label for="r_phone">WhatsApp (com DDD)</label><input id="r_phone" type="tel" inputmode="tel" placeholder="Ex.: 85 99999-9999"></div>
+<p class="s full" id="r_hint"></p>
+<div><label for="r_code">Código / ID (opcional)</label><input id="r_code" placeholder="Automático" autocomplete="off"></div>
+<div><label for="r_close">Cartão fecha dia</label><input id="r_close" type="number" min="1" max="31" value="10"></div>
+<div><label for="r_day">Vence dia</label><input id="r_day" type="number" min="1" max="31" value="17"></div>
+<p class="s full" style="margin:-4px 0 0">Compra até o fechamento vence neste mês; depois, no mês seguinte. A data de cada dívida pode ser mudada.</p>
+<div class="full"><label for="r_obs">Observação sobre a pessoa (opcional, só você vê)</label><input id="r_obs" placeholder="Ex.: colega do trabalho, paga no dia 5"></div>
+<div class="full" id="r_debts"></div>
+<button class="sec full" type="button" id="r_add">＋ Adicionar outra dívida</button>
+<datalist id="cats"></datalist>
+<button class="sec" type="button" data-close="rd">Cancelar</button><button class="add" type="submit" id="r_go">Registrar</button>
+</form></dialog>
+
+<dialog id="cd"><div class="cs">
+<h2>⚙ Configurações</h2>
+<div class="cg"><h3>Som e aparência</h3>
+<div class="cr"><span>Sons do site</span><button class="sec" id="snd">Ligado</button></div>
+<div class="cr"><span>Modo privacidade (esconder valores)</span><button class="sec" id="privb">Desativado</button></div>
+<div class="cr"><span>Efeitos e partículas</span><button class="sec" id="fxb">Ligado</button></div>
+<div class="cr"><span>Tema</span><select id="th"><option value="">Claro</option><option value="dark">Escuro</option></select></div></div>
+<div class="cg"><h3>Cartão e cobrança</h3>
+<div class="cr"><span>Cartão fecha dia</span><input id="cfg_close" type="number" min="1" max="31"></div>
+<div class="cr"><span>Vencimento todo dia</span><input id="cfg_day" type="number" min="1" max="31"></div>
+<div class="cr"><span>Seu WhatsApp (contato)</span><input id="cfg_wa" type="tel" placeholder="88 98229-3900" style="width:170px"></div>
+<p class="s">Compras feitas até o dia do fechamento vencem neste mês, e as feitas depois vencem no mês seguinte. Quem paga a parcela do mês fica <b>Em dia</b> até virar o mês.</p></div>
+<div class="cg"><h3>Chaves Pix (aparecem para o devedor)</h3>
+<div id="pix_l"></div>
+<div class="fg" id="pix_f" style="margin-top:10px">
+<div><label for="px_t">Tipo da chave</label><select id="px_t"><option>Celular</option><option>CPF</option><option>CNPJ</option><option>E-mail</option><option>Aleatória</option></select></div>
+<div><label for="px_k">Chave</label><input id="px_k" placeholder="Ex.: 88982293900" autocomplete="off"></div>
+<div><label for="px_n">Nome do titular</label><input id="px_n" placeholder="Como aparece no banco"></div>
+<div><label for="px_b">Instituição</label><input id="px_b" placeholder="Ex.: Nubank"></div>
+<div class="full"><label for="px_c">Cidade (para o Pix copia e cola)</label><input id="px_c" placeholder="Ex.: Icapuí"></div>
+<input id="px_id" type="hidden">
+<button class="sec" type="button" id="px_x">Limpar</button><button class="add" type="button" id="px_s">Salvar chave Pix</button></div></div>
+<div class="cg"><h3>Área do devedor</h3>
+<div class="cr"><span>Página dos clientes</span><a class="sec lkb" href="devedor.html" target="_blank" rel="noopener">Abrir devedor.html</a></div>
+<div class="cr"><span>Publicar acessos</span><button class="add" id="acc_all">Baixar acessos.json</button></div>
+<p class="s">Crie o login de cada devedor na engrenagem ⚙ da pessoa. Depois coloque o <b>acessos.json</b> na mesma pasta do devedor.html (substituindo o antigo) sempre que quiser atualizar o que eles veem. Também dá para enviar um link individual pelo WhatsApp.</p></div>
+<div class="cg"><h3>Segurança</h3>
+<div class="cr"><span>Pedir PIN ao abrir</span><button class="sec" id="pin_t">Ativado</button></div>
+<div class="cr"><span>Alterar PIN</span><button class="sec" id="pin_c">Alterar</button></div>
+<div class="cr"><span>Bloquear agora</span><button class="sec" id="pin_l">Bloquear</button></div>
+<p class="s">O PIN inicial é 1234. Ele protege a tela, mas não criptografa os dados guardados no aparelho.</p></div>
+<div class="cg"><h3>Aplicativo no celular</h3>
+<div class="cr"><span>Instalar na tela inicial</span><button class="add" id="inst">Instalar aplicativo</button></div>
+<p class="s" id="i_hint"></p></div>
+<div class="cg"><h3>Dados e backup</h3>
+<div class="bk2"><button class="sec" id="bc">Copiar backup (.js)</button><button class="sec" id="bd">Baixar backup</button><button class="sec" id="br">Restaurar backup</button><button class="sec" id="cv">Exportar CSV (Excel)</button><button class="sec" id="imb">Importar planilha (CSV)</button><input id="bf" type="file" accept=".js,.txt,.json" hidden></div>
+<p class="s" id="bs">O backup é um arquivo JavaScript com dívidas, telefones e fotos. Cole o texto copiado em um arquivo chamado dividas-backup.js (ou baixe o arquivo).</p>
+<p class="s" id="mode"></p></div>
+<button class="add" data-close="cd">Fechar</button>
+</div></dialog>
+
+<dialog id="rk"><h2>🏆 Ranking de pagadores</h2>
+<p class="s">Tempo médio entre a data da dívida e o pagamento. Menos dias é melhor. Dívidas registradas já como pagas contam 0 dia.</p>
+<div id="rk_l"></div>
+<button class="add" style="margin-top:14px;width:100%" data-close="rk">Fechar</button></dialog>
+
+<dialog id="im"><h2>Importar planilha</h2>
+<p class="s">Cole as linhas ou escolha um arquivo CSV. Colunas: Descrição, Nome, Valor, Data, Origem, Situação, Observação. A primeira linha pode ser o cabeçalho.</p>
+<textarea id="i_txt" rows="7" placeholder="Descrição;Nome;Valor;Data;Origem;Situação;Observação"></textarea>
+<div id="i_pv" class="s" style="margin-bottom:12px"></div>
+<div class="fg"><button class="sec" id="i_file">Escolher arquivo</button><button class="sec" id="i_tpl">Baixar modelo</button><button class="sec" data-close="im">Cancelar</button><button class="add" id="i_go">Importar</button></div>
+<input id="i_f" type="file" accept=".csv,.txt" hidden></dialog>
+
+<dialog id="sd"><form class="fg" id="sf"><h2 class="full">Mover data</h2><p class="s full" id="s_t"></p>
+<div class="full"><label for="s_d">Nova data</label><input id="s_d" type="date" required></div>
+<button class="sec" type="button" data-close="sd">Cancelar</button><button class="add" type="submit">Mover</button></form></dialog>
+
+<div id="selbar" hidden><span id="sel_n">0 selecionadas</span><button class="sec" id="s_all">Todas</button><button class="add" id="s_pay">Pagar</button><button class="sec" id="s_date">Mover data</button><button class="sec" id="s_del">Apagar</button><button class="sec" id="s_x" aria-label="Sair">✕</button></div>
+
+<div id="lock"><div class="lk"><div class="logo"><img src="logo.png" alt=""></div><h2>Quem Me Deve</h2><p class="s" id="lk_m">Digite seu PIN</p><div class="dots" id="lk_d"></div><div class="pad" id="lk_p"></div></div></div>
+
+<dialog id="recd"><label class="ck" id="rc_jw" hidden><input type="checkbox" id="rc_j"> Juntar todas as dívidas em um só quadro</label>
+<div id="rc_b"></div>
+<div class="fg rc-act">
+<button class="add" id="rc_w">Enviar no WhatsApp</button><button class="sec" id="rc_i">Imagem</button>
+<button class="sec" id="rc_c">Copiar texto</button><button class="sec" id="rc_p">Imprimir / PDF</button>
+<button class="sec full" data-close="recd">Fechar</button></div></dialog>
+
+<dialog id="dg"><form class="fg" id="dgf"><h2 class="full">⚙ Editar dívida</h2><p class="s full" id="dg_t"></p>
+<div class="full"><label for="dg_n">Nome da dívida</label><input id="dg_n" required placeholder="Ex.: Celular"></div>
+<div><label for="dg_w">Nome da pessoa</label><input id="dg_w" list="ppl" required></div>
+<div><label for="dg_c">Origem</label><input id="dg_c" list="cats" placeholder="Ex.: Nubank"></div>
+<div class="full"><label for="dg_o">Observação da dívida</label><input id="dg_o" placeholder="Aparece no recibo. Ex.: iPhone usado, entrada de R$ 100"></div>
+<button class="sec full" type="button" id="dg_x">🗑 Apagar dívida inteira</button>
+<button class="sec" type="button" data-close="dg">Cancelar</button><button class="add" type="submit">Salvar</button></form></dialog>
+
+<dialog id="pg"><form class="fg" id="pgf">
+<h2 class="full">💵 Registrar pagamento</h2>
+<p class="s full" id="pg_t"></p>
+<div class="full pgq" id="pgq" hidden>
+<label for="pg_q">Escreva rápido</label><input id="pg_q" placeholder="Ex.: Ana 250 dinheiro" autocomplete="off">
+<div class="fg" style="margin-top:10px"><div><label for="pg_who">Quem pagou</label><select id="pg_who"></select></div><div><label for="pg_dbt">Qual dívida</label><select id="pg_dbt"></select></div></div>
+</div>
+<div class="full mchips" id="pg_ch"><button type="button" data-m="Dinheiro">💵 Dinheiro</button><button type="button" data-m="Pix">⚡ Pix</button><button type="button" data-m="Cartão">💳 Cartão</button><button type="button" data-m="Transferência">🏦 Transferência</button><button type="button" data-m="Boleto">📄 Boleto</button><button type="button" data-m="Outro">Outro</button></div>
+<div class="pgsum full"><div><small>Falta pagar</small><b id="pg_rem">R$ 0,00</b></div><div><small>Depois deste pagamento</small><b id="pg_after">R$ 0,00</b></div></div>
+<div><label for="pg_v">Valor recebido (R$)</label><input id="pg_v" type="number" step="0.01" min="0.01" required placeholder="0,00"><button class="pcs" type="button" id="pg_all" style="margin-top:6px">Pagar tudo</button></div>
+<div><label for="pg_m">Forma de pagamento</label><select id="pg_m"><option>Pix</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option><option>Boleto</option><option>Outro</option></select></div>
+<div><label for="pg_d">Data do pagamento</label><input id="pg_d" type="date" required></div>
+<div><label for="pg_tm">Hora</label><input id="pg_tm" type="time"></div>
+<p class="s full" id="pg_ex" style="margin:-4px 0 0"></p>
+<div class="full"><label for="pg_n">Observação</label><input id="pg_n" placeholder="Opcional"></div>
+<div class="full"><label>Comprovantes (pode ser mais de um)</label><div class="thumbs" id="pg_th"></div><button class="sec" type="button" id="pg_add">＋ Adicionar fotos</button></div>
+<button class="sec" type="button" data-close="pg">Fechar</button><button class="add" type="submit" id="pg_go">Registrar pagamento</button>
+<div class="full" id="pg_h"></div>
+</form></dialog>
+
+<div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
+<canvas id="fxc" aria-hidden="true"></canvas>
+<script src="shared.js?v=22"></script>
+<script src="script.js?v=25"></script>
+<script src="efeitos.js?v=21"></script>
+</body>
+</html>

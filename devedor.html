@@ -4,14 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Quem Me Deve · Área do devedor</title>
-<meta name="theme-color" content="#02296b">
+<meta name="theme-color" content="#050b30">
+<script>try{var t=localStorage.getItem("dv-th");document.documentElement.dataset.theme=t===""?"light":(t||"dark")}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=21">
-<link rel="stylesheet" href="devedor.css?v=21">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="devedor.css?v=24">
 </head>
 <body class="dvb">
 
@@ -22,7 +23,7 @@
 <h1>Área do devedor</h1>
 <p class="s">Entre com o seu <b>ID</b> e a sua <b>senha</b> para ver as suas dívidas.</p>
 <div><label for="l_id">ID</label><input id="l_id" placeholder="Ex.: C001" autocapitalize="characters" autocomplete="username" required></div>
-<div><label for="l_pw">Senha</label><input id="l_pw" type="password" autocomplete="current-password" required></div>
+<div><label for="l_pw">Senha</label><div class="pwr"><input id="l_pw" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" required><button type="button" class="eye" id="l_eye" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div></div>
 <label class="ck"><input type="checkbox" id="l_rm" checked> Lembrar meu ID neste aparelho</label>
 <button class="add big" type="submit" id="l_go">Entrar</button>
 <p class="err" id="l_err" role="alert"></p>
@@ -72,7 +73,7 @@
 
 <div id="toast" role="status"><span id="tm"></span></div>
 <script src="qrcode.js"></script>
-<script src="shared.js?v=21"></script>
-<script src="devedor.js?v=21"></script>
+<script src="shared.js?v=22"></script>
+<script src="devedor.js?v=24"></script>
 </body>
 </html>

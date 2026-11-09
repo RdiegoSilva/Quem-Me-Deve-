@@ -34,10 +34,10 @@ $("snd").addEventListener("click",function(){muted=!muted;LS.set("dv-mute",muted
 
 /* ---------- tema ---------- */
 var root=document.documentElement;
-function themeNow(){return root.dataset.theme||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}
-function themeBtn(){$("th").value=root.dataset.theme||""}
-if(LS.get("dv-th"))root.dataset.theme=LS.get("dv-th");
-$("th").addEventListener("change",function(){var v=$("th").value;if(v){root.dataset.theme=v;LS.set("dv-th",v)}else{delete root.dataset.theme;LS.set("dv-th","")}snd("tap")});themeBtn();
+function themeNow(){return root.dataset.theme||"dark"}
+function themeBtn(){$("th").value=root.dataset.theme==="light"?"":"dark"}
+var _th=LS.get("dv-th");root.dataset.theme=_th===""?"light":(_th||"dark");
+$("th").addEventListener("change",function(){var v=$("th").value;root.dataset.theme=v?"dark":"light";LS.set("dv-th",v?"dark":"");snd("tap")});themeBtn();
 
 /* ---------- aviso com desfazer ---------- */
 var tt,undoFn=null,t2fn=null;
@@ -246,7 +246,7 @@ function sib(id){
 var kIds=[],sibs=[],kRef="";
 function openEdit(it){
     var id=it.id;editId=id;sibs=sib(id);$("e_allw").hidden=!sibs.length;$("e_n").textContent=sibs.length;$("e_all").checked=true;
-    $("e_desc").value=it.desc;$("e_who").value=it.who;$("e_cat").value=it.cat||"";$("e_val").value=it.amount;$("e_got").value=got(it)||"";$("e_mon").value=it.date||it.month+"-01";$("e_note").value=it.note||"";
+    $("e_desc").value=it.desc;$("e_who").value=it.who;$("e_cat").value=it.cat||"";$("e_val").value=it.amount;$("e_got").value=got(it)||"";$("e_mon").value=it.date||it.month+"-01";$("e_note").value=it.note||"";$("e_pw").hidden=!it.paid;$("e_pa").value=it.paidAt||"";$("e_pt").value=it.paidTm||"";
     $("e_h").innerHTML=histHTML(it);
     $("ed").showModal();
 }
@@ -280,7 +280,7 @@ $("kf").addEventListener("submit",function(e){
   document.querySelectorAll("#k_l input").forEach(function(i){
     var it=items.find(function(x){return x.id===i.dataset.k});if(!it||it.paid===i.checked)return;
     prev.push(it);
-    put(i.checked?Object.assign({},it,{paid:true,got:it.amount,paidAt:today()}):Object.assign({},it,{paid:false,got:0,paidAt:""}));
+    put(i.checked?Object.assign({},it,{paid:true,got:it.amount,paidAt:today(),paidTm:nowTm()}):Object.assign({},it,{paid:false,got:0,paidAt:"",paidTm:""}));
   });
   closeDlg($("kd"));
   if(prev.length){snd("ok");if(prev.some(function(x){return !x.paid}))fxBurst();toast(prev.length+" parcela(s) atualizada(s).",function(){prev.forEach(function(x){put(x)})})}
@@ -369,11 +369,14 @@ $("t_e").addEventListener("click",function(){
 });
 var rphoto="";
 function updR(){var n=$("who").value.trim();$("r_av").innerHTML=rphoto?'<img class="av" alt="" src="'+rphoto+'">':av(n||"?")}
-function dayDef(){var n=+LS.get("dv-day");return n>=1&&n<=31?n:10}
-function nextDue(day){
-  var n=new Date(),y=n.getFullYear(),m=n.getMonth(),t0=new Date(y,m,n.getDate()).getTime();
+function dayDef(){var n=+LS.get("dv-day");return n>=1&&n<=31?n:17}
+function closeDef(){var n=+LS.get("dv-close");return n>=1&&n<=31?n:10}
+function nowTm(){var n=new Date();return pad(n.getHours())+":"+pad(n.getMinutes())}
+function nextDue(day,close){
+  var n=new Date(),y=n.getFullYear(),m=n.getMonth();
+  close=Math.max(1,Math.min(31,+close||closeDef()));
   function mk(yy,mm){var last=new Date(yy,mm+1,0).getDate();return new Date(yy,mm,Math.min(day,last))}
-  var d=mk(y,m);if(d.getTime()<t0)d=mk(y,m+1);
+  var d=n.getDate()<=close?mk(y,m):mk(y,m+1);
   return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 }
 function debtBlock(n){
@@ -390,7 +393,7 @@ function debtBlock(n){
 function addBlock(){
   var box=$("r_debts"),n=box.querySelectorAll(".dbk").length+1,w=document.createElement("div");
   w.innerHTML=debtBlock(n);var bk=w.firstChild;box.appendChild(bk);
-  bk.querySelector(".d-date").value=nextDue(Math.max(1,Math.min(31,+$("r_day").value||dayDef())));
+  bk.querySelector(".d-date").value=nextDue(Math.max(1,Math.min(31,+$("r_day").value||dayDef())),$("r_close").value);
   return bk;
 }
 function renumber(){document.querySelectorAll("#r_debts .dbk").forEach(function(b,i){b.querySelector(".dbk-h b").textContent="Dívida "+(i+1)});document.querySelectorAll("#r_debts [data-rm]").forEach(function(x,i,a){x.hidden=a.length<2})}
@@ -408,7 +411,7 @@ function regHint(){
   $("r_hint").textContent=names.length?nm+" já tem "+names.length+" dívida"+(names.length>1?"s":"")+": "+names.join(", ")+". As novas serão somadas às que já existem.":"";
 }
 function openReg(name){
-  rphoto="";$("r_phone").value="";$("r_code").value="";$("r_obs").value=(name&&people[name]&&people[name].obs)||"";delete $("r_code").dataset.man;$("who").value=name||"";$("r_day").value=dayDef();
+  rphoto="";$("r_phone").value="";$("r_code").value="";$("r_obs").value=(name&&people[name]&&people[name].obs)||"";delete $("r_code").dataset.man;$("who").value=name||"";$("r_day").value=dayDef();$("r_close").value=closeDef();
   $("r_debts").innerHTML="";addBlock();renumber();
   $("who").dispatchEvent(new Event("input"));updR();regHint();
   $("rd").showModal();setTimeout(function(){(name?$("r_debts").querySelector(".d-name"):$("who")).focus()},60);
@@ -553,10 +556,10 @@ function applyPay(who,key,amount,method,date,note,proofs){
   pTargets(who,key).forEach(function(x){
     if(left<=0.004)return;
     var take=round2(Math.min(rem(x),left)),ng=round2(got(x)+take),full=ng>=x.amount-0.004;
-    put(Object.assign({},x,full?{paid:true,got:x.amount,paidAt:date}:{got:ng}));
+    put(Object.assign({},x,full?{paid:true,got:x.amount,paidAt:date,paidTm:($("pg_tm").value||nowTm())}:{got:ng}));
     al.push({id:x.id,amt:take});left=round2(left-take);
   });
-  var p={id:"p"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),who:who,key:key||"",amount:round2(amount-left),method:method,date:date,note:note,proofs:proofs,alloc:al,ts:Date.now()};
+  var p={id:"p"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),who:who,key:key||"",amount:round2(amount-left),method:method,date:date,tm:($("pg_tm").value||nowTm()),note:note,proofs:proofs,alloc:al,ts:Date.now()};
   putPay(p);return p;
 }
 function undoPay(p){
@@ -564,7 +567,7 @@ function undoPay(p){
   (p.alloc||[]).forEach(function(a){
     var x=items.find(function(i){return i.id===a.id});if(!x)return;prev.push(x);
     var ng=round2((x.paid?x.amount:(x.got||0))-a.amt);
-    put(Object.assign({},x,{paid:false,got:ng>0.004?ng:0,paidAt:""}));
+    put(Object.assign({},x,{paid:false,got:ng>0.004?ng:0,paidAt:"",paidTm:""}));
   });
   delPay(p.id);
   return function(){prev.forEach(function(x){put(x)});putPay(p)};
@@ -616,7 +619,7 @@ function openPay(who,key,quick){
     pgS.who=$("pg_who").value;fillDbt();$("pg_q").value="";
   }
   pgTitle();
-  $("pg_v").value="";$("pg_n").value="";$("pg_d").value=today();$("pg_m").value=LS.get("dv-pm")||(quick?"Dinheiro":"Pix");mSync();
+  $("pg_v").value="";$("pg_n").value="";$("pg_d").value=today();$("pg_tm").value=nowTm();$("pg_m").value=LS.get("dv-pm")||(quick?"Dinheiro":"Pix");mSync();
   pgThumbs();pgRefresh();
   $("pg").showModal();setTimeout(function(){(quick?$("pg_q"):$("pg_v")).focus()},60);
 }
@@ -681,7 +684,7 @@ function openPerson(w){
   editName=w;var p=people[w]||{};photo=p.photo||"";
   var ps=items.filter(function(x){return x.who===w}),T=0,G=0,R=0;ps.forEach(function(x){T+=x.amount;G+=got(x);R+=rem(x)});
   $("p_sum").innerHTML='<div class="t"><small>Total da dívida · '+ps.length+' registro(s)</small><input id="p_total" type="number" step="0.01" min="0" value="'+T.toFixed(2)+'" aria-label="Total da dívida"></div><div><small>Já pagou</small><b>'+brl(G)+'</b></div><div><small>Falta pagar</small><b>'+brl(R)+'</b></div>';
-  $("p_name").value=w;$("p_code").value=(people[w]||{}).code||"";$("p_obs").value=(people[w]||{}).obs||"";$("p_phone").value=p.phone||"";$("p_av").innerHTML=av(w);
+  $("p_name").value=w;$("p_code").value=(people[w]||{}).code||"";$("p_obs").value=(people[w]||{}).obs||"";$("p_phone").value=p.phone||"";$("p_av").innerHTML=av(w);accFill(w);
   $("pd").showModal();
 }
 $("p_pick").addEventListener("click",function(){$("p_file").click()});
@@ -702,7 +705,7 @@ $("p_q").addEventListener("click",function(){
   var w=editName,prev=items.filter(function(x){return x.who===w&&!x.paid});
   if(!prev.length){toast("Nada pendente para "+w+".");return}
   if(!confirm("Marcar "+prev.length+" item(ns) de "+w+" como pagos?"))return;
-  prev.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today()}))});
+  prev.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today(),paidTm:nowTm()}))});
   closeDlg($("pd"));snd("ok");fxBurst($("p_q"));toast(prev.length+" item(ns) quitados.",function(){prev.forEach(function(x){put(x)})});
 });
 $("pf").addEventListener("submit",function(e){
@@ -728,6 +731,11 @@ $("pf").addEventListener("submit",function(e){
   }
   if(nn!==old)delPerson(old);
   putPerson(nn,{phone:$("p_phone").value.trim(),photo:photo,code:pcode,obs:$("p_obs").value.trim()});
+  var npw=$("p_pwd").value.trim(),ncd=cd(nn);
+  if(npw&&npw!==(accPw()[ncd]||"")){
+    if(noCrypto()){}
+    else accMake(nn,npw).then(function(){toast("Senha salva.")}).catch(function(err){toast("Não consegui salvar a senha: "+err.message)});
+  }
   closeDlg($("pd"));snd("ok");
 });
 
@@ -759,7 +767,7 @@ $("list").addEventListener("click",function(e){
     var prev=items.filter(function(x){return x.who===w&&!x.paid&&ids.indexOf(x.id)>=0});
     if(!prev.length){toast("Nada pendente para "+w+".");return}
     if(!confirm("Marcar "+prev.length+" item(ns) de "+w+" como pagos?"))return;
-    prev.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today()}))});
+    prev.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today(),paidTm:nowTm()}))});
     snd("ok");fxBurst(b);toast(prev.length+" item(ns) quitados.",function(){prev.forEach(put)});return;
   }
   if(D.a){attach(D.a);return}
@@ -769,7 +777,7 @@ $("list").addEventListener("click",function(e){
   var id=D.t||D.e||D.d,it=items.find(function(x){return x.id===id});if(!it)return;
   if(D.t){
     var old=it;
-    put(it.paid?Object.assign({},it,{paid:false,got:0,paidAt:""}):Object.assign({},it,{paid:true,got:it.amount,paidAt:today()}));
+    put(it.paid?Object.assign({},it,{paid:false,got:0,paidAt:"",paidTm:""}):Object.assign({},it,{paid:true,got:it.amount,paidAt:today(),paidTm:nowTm()}));
     snd(old.paid?"tap":"ok");if(!old.paid)fxBurst(b);if(!old.paid)toast("Marcado como pago.",function(){put(old)},"Anexar comprovante",function(){attach(old.id)});
   }else if(D.d){
     put(Object.assign({},it,{deleted:Date.now()}));snd("del");toast("Item movido para a lixeira.",function(){put(it)});
@@ -782,7 +790,7 @@ $("ef").addEventListener("submit",function(e){
   var it=items.find(function(x){return x.id===editId}),a=parseFloat($("e_val").value);
   if(!it||isNaN(a)){closeDlg($("ed"));return}
   var g0=Math.max(0,parseFloat($("e_got").value)||0),keep=it.paid&&g0===it.amount,g=keep?a:g0,paid=g>=a;
-  put(Object.assign({},it,{desc:$("e_desc").value.trim(),who:$("e_who").value.trim(),cat:$("e_cat").value.trim(),amount:a,got:paid?a:g,paid:paid,paidAt:paid?(it.paid&&it.paidAt?it.paidAt:today()):"",date:$("e_mon").value,month:$("e_mon").value.slice(0,7),note:$("e_note").value.trim()}));
+  put(Object.assign({},it,{desc:$("e_desc").value.trim(),who:$("e_who").value.trim(),cat:$("e_cat").value.trim(),amount:a,got:paid?a:g,paid:paid,paidAt:paid?($("e_pa").value||(it.paid&&it.paidAt?it.paidAt:today())):"",paidTm:paid?($("e_pa").value?$("e_pt").value:(it.paid&&it.paidTm?it.paidTm:nowTm())):"",date:$("e_mon").value,month:$("e_mon").value.slice(0,7),note:$("e_note").value.trim()}));
   if(sibs.length&&$("e_all").checked){
     var base=$("e_desc").value.trim().replace(/\s*\d+\/\d+$/,"");
     sibs.forEach(function(x){
@@ -816,7 +824,7 @@ $("f").addEventListener("submit",function(e){
   var ph=$("r_phone").value.trim();
   var robs=$("r_obs").value.trim();
   if(ph||rphoto||rcode||robs!==(cur0.obs||"")){var cur=people[who]||{};putPerson(who,{phone:ph||cur.phone||"",photo:rphoto||cur.photo||"",code:rcode||cur.code||"",obs:robs})}
-  var dy=parseInt($("r_day").value);if(dy>=1&&dy<=31)LS.set("dv-day",String(dy));
+  var cl=parseInt($("r_close").value);if(cl>=1&&cl<=31)LS.set("dv-close",String(cl));var dy=parseInt($("r_day").value);if(dy>=1&&dy<=31)LS.set("dv-day",String(dy));
   snd("add");closeDlg($("rd"));
   toast(made+" dívida"+(made>1?"s":"")+" registrada"+(made>1?"s":"")+" para "+who+" ("+tp+" parcela"+(tp>1?"s":"")+(tpd?", "+tpd+" já paga"+(tpd>1?"s":""):"")+").");
   rphoto="";
@@ -1163,7 +1171,7 @@ function selItems(){return items.filter(function(x){return sel.has(x.id)})}
 $("s_pay").addEventListener("click",function(){
   var p=selItems().filter(function(x){return !x.paid});
   if(!p.length){toast("Nenhuma pendente selecionada.");return}
-  p.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today()}))});
+  p.forEach(function(x){put(Object.assign({},x,{paid:true,got:x.amount,paidAt:today(),paidTm:nowTm()}))});
   snd("ok");fxBurst();toast(p.length+" dívida(s) pagas.",function(){p.forEach(function(x){put(x)})});selEnd();render();
 });
 $("s_del").addEventListener("click",function(){
@@ -1306,13 +1314,125 @@ $("pin_l").addEventListener("click",function(){
   closeDlg($("cd"));buf="";dots();$("lk_m").textContent="Digite seu PIN";$("lock").hidden=false;
 });
 $("cfg").addEventListener("click",function(){
-  sndBtn();themeBtn();pinBtn();$("cfg_day").value=dayDef();
+  sndBtn();themeBtn();pinBtn();$("cfg_day").value=dayDef();cfgFill();
   $("i_hint").textContent=standalone?"Você já está usando o app instalado.":"Instala o site como app, com ícone e tela cheia no celular. Precisa estar hospedado em https.";
   snd("tap");$("cd").showModal();
 });
 (async function(){if(!LS.get("dv-pin")){LS.set("dv-pin",await hash("1234"));LS.set("dv-pinlen","4")}})();
 
 window.addEventListener("error",function(e){toast("Erro: "+e.message)});
+
+
+/* ---------- acesso do devedor, Pix e configurações ---------- */
+function lsj(k,d){try{var v=JSON.parse(LS.get(k)||"null");return v==null?d:v}catch(e){return d}}
+function waMine(){return LS.get("dv-wa")||"88982293900"}
+function pixList(){return lsj("dv-pix",[])}
+function pixSave(a){LS.set("dv-pix",JSON.stringify(a))}
+function copyTxt(t,msg){
+  function fb(){var a=document.createElement("textarea");a.value=t;a.style.cssText="position:fixed;opacity:0";document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}a.remove();toast(ok?msg:"Não consegui copiar. Copie manualmente.")}
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(function(){toast(msg)},fb);else fb();
+}
+$("cfg_close").addEventListener("change",function(){var n=Math.max(1,Math.min(31,parseInt($("cfg_close").value)||10));$("cfg_close").value=n;LS.set("dv-close",String(n));toast("Cartão fecha dia "+n+".")});
+$("cfg_wa").addEventListener("change",function(){LS.set("dv-wa",$("cfg_wa").value.replace(/\D/g,""));toast("WhatsApp salvo.")});
+function cfgFill(){$("cfg_close").value=closeDef();$("cfg_wa").value=waMine();pxDraw()}
+/* chaves Pix */
+function pxDraw(){
+  var a=pixList();
+  $("pix_l").innerHTML=a.length?a.map(function(k,i){return '<div class="cr"><span><b>'+esc(k.type)+(i===0?" · principal":"")+'</b><br><small class="s">'+esc(k.key)+(k.name?" · "+esc(k.name):"")+(k.bank?" · "+esc(k.bank):"")+'</small></span><span><button class="sec" type="button" data-pe="'+i+'">Editar</button> '+(i>0?'<button class="sec" type="button" data-pm="'+i+'">★</button> ':"")+'<button class="sec" type="button" data-pd="'+i+'">✕</button></span></div>'}).join(""):'<p class="s">Nenhuma chave cadastrada ainda.</p>';
+}
+function pxClear(){["px_k","px_n","px_b","px_c"].forEach(function(i){$(i).value=""});$("px_id").value="";$("px_t").selectedIndex=0}
+$("px_x").addEventListener("click",pxClear);
+$("px_s").addEventListener("click",function(){
+  var k=$("px_k").value.trim();if(!k){toast("Digite a chave Pix.");return}
+  var a=pixList(),o={type:$("px_t").value,key:k,name:$("px_n").value.trim(),bank:$("px_b").value.trim(),city:$("px_c").value.trim()},ix=$("px_id").value;
+  if(ix!==""&&a[+ix])a[+ix]=o;else a.push(o);
+  pixSave(a);pxClear();pxDraw();snd("ok");toast("Chave Pix salva. Atualize os acessos para o devedor ver.");
+});
+$("pix_l").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;var a=pixList();
+  if(b.dataset.pe!=null){var k=a[+b.dataset.pe];$("px_t").value=k.type;$("px_k").value=k.key;$("px_n").value=k.name||"";$("px_b").value=k.bank||"";$("px_c").value=k.city||"";$("px_id").value=b.dataset.pe}
+  else if(b.dataset.pm!=null){var m=a.splice(+b.dataset.pm,1)[0];a.unshift(m);pixSave(a);pxDraw()}
+  else if(b.dataset.pd!=null){if(!confirm("Remover esta chave Pix?"))return;a.splice(+b.dataset.pd,1);pixSave(a);pxDraw()}
+});
+/* dados que o devedor enxerga */
+function accCode(w){
+  var c=cd(w);if(c)return c;
+  var mx=0;Object.keys(people).forEach(function(n){var m=/^C?(\d+)$/i.exec(people[n].code||"");if(m)mx=Math.max(mx,+m[1])});
+  c="C"+String(mx+1).padStart(3,"0");var p=people[w]||{};
+  putPerson(w,{phone:p.phone,photo:p.photo,code:c,obs:p.obs});return c;
+}
+function buildData(w){
+  var G={},order=[];
+  items.filter(function(x){return x.who===w}).forEach(function(x){var k=keyOfX(x);if(!G[k]){G[k]=[];order.push(k)}G[k].push(x)});
+  var debts=order.map(function(k){
+    var l=G[k].slice().sort(function(a,b){var p=a.date||a.month+"-01",q=b.date||b.month+"-01";return p<q?-1:p>q?1:a.id<b.id?-1:1}),f=l[0];
+    return {name:f.desc.replace(/\s*\d+\/\d+$/,""),cat:f.cat||"",dn:f.dn||"",note:f.note||"",parcels:l.map(function(x,i){
+      var m=/(\d+\/\d+)$/.exec(x.desc);
+      return {n:m?m[1]:(l.length>1?(i+1)+"/"+l.length:"Única"),amount:x.amount,due:x.date||"",month:x.month,paid:!!x.paid,got:x.got||0,at:x.paidAt||"",tm:x.paidTm||""};
+    })};
+  });
+  var py=pays.filter(function(p){return p.who===w}).map(function(p){return {date:p.date,tm:p.tm||"",method:p.method||"",label:p.note||"",amount:p.amount}});
+  var pix=pixList().map(function(k,i){return {type:k.type,key:k.key,name:k.name,bank:k.bank,city:k.city,main:i===0}});
+  return {person:{name:w,code:accCode(w)},cfg:{wa:waMine(),pix:pix},debts:debts,pays:py,gen:new Date().toISOString()};
+}
+function accPw(){return lsj("dv-accpw",{})}
+function accTk(){return lsj("dv-acctk",{})}
+function noCrypto(){if(!(window.crypto&&crypto.subtle)){toast("Para criar o acesso, abra o site em https (hospedado) ou em localhost.");return true}return false}
+async function accMake(w,pw){
+  var d=buildData(w),code=d.person.code,t=await QM.seal(d,pw,code);
+  var P=accPw(),T=accTk();P[code]=pw;T[code]=t;LS.set("dv-accpw",JSON.stringify(P));LS.set("dv-acctk",JSON.stringify(T));
+  return {code:code,token:t};
+}
+function accLink(code,t){return location.href.replace(/[#?].*$/,"").replace(/[^\/]*$/,"")+"devedor.html#a="+code+"."+t}
+function accFill(w){
+  var c=cd(w),P=accPw();
+  $("p_aid").textContent=c||"(será criado ao salvar o acesso)";
+  $("p_pwd").value=c&&P[c]?P[c]:"";$("p_pwd").type="text";$("p_sh").textContent="🙈 Ocultar senha";
+  $("p_am").textContent=c&&accTk()[c]?"Acesso criado. Use ‘Criar / atualizar acesso’ sempre que mudar dívidas ou pagamentos.":"Ainda sem acesso.";
+}
+$("p_cp").addEventListener("click",function(){var v=$("p_pwd").value;if(!v){toast("Ainda não tem senha. Digite ou gere uma.");return}copyTxt(v,"Senha copiada!")});
+$("p_sh").addEventListener("click",function(){var i=$("p_pwd"),h=i.type==="password";i.type=h?"text":"password";$("p_sh").textContent=h?"🙈 Ocultar senha":"👁 Mostrar senha"});
+$("p_pg").addEventListener("click",function(){$("p_pwd").value=QM.genPass(6);snd("tap");toast("Senha gerada. Toque em ‘Criar / atualizar acesso’.")});
+$("p_ac").addEventListener("click",async function(){
+  if(noCrypto())return;
+  var w=editName,pw=$("p_pwd").value.trim();
+  if(!pw){pw=QM.genPass(6);$("p_pwd").value=pw}
+    try{var r=await accMake(w,pw);accFill(w);$("p_am").textContent="Acesso pronto. ID "+r.code+" · senha "+pw+". Agora copie o link ou baixe o acessos.json.";snd("ok");render()}catch(e){toast("Erro ao criar acesso: "+e.message)}
+});
+async function accEnsure(){
+  var w=editName,pw=$("p_pwd").value.trim();
+  if(noCrypto())return null;
+  if(!pw){toast("Gere ou digite uma senha primeiro.");return null}
+  try{var r=await accMake(w,pw);accFill(w);return {code:r.code,token:r.token,pw:pw}}catch(e){toast("Erro: "+e.message);return null}
+}
+$("p_al").addEventListener("click",async function(){var r=await accEnsure();if(!r)return;copyTxt(accLink(r.code,r.token),"Link copiado! Passe também o ID e a senha.")});
+$("p_aw").addEventListener("click",async function(){
+  var r=await accEnsure();if(!r)return;var w=editName,num=waNum((people[w]||{}).phone);
+  var msg="Olá, "+w.split(" ")[0]+"! Seu acesso para ver suas dívidas:\n"+accLink(r.code,r.token)+"\n\nID: "+r.code+"\nSenha: "+r.pw;
+  snd("wa");window.open("https://wa.me/"+num+"?text="+encodeURIComponent(msg),"_blank","noopener");
+  if(!num)toast("Sem telefone salvo: escolha o contato no WhatsApp.");
+});
+$("p_ar").addEventListener("click",async function(){
+  if(noCrypto())return;
+  var w=editName,pw=$("p_pwd").value.trim(),c=cd(w),old=c?accPw()[c]:"";
+  if(!pw){toast("Digite a nova senha no campo acima e toque em Alterar senha.");$("p_pwd").focus();return}
+  if(old&&pw===old){toast("Essa já é a senha atual do devedor.");return}
+  try{
+    var r=await accMake(w,pw);accFill(w);
+    $("p_am").textContent="Senha alterada para: "+pw+" · ID "+r.code+". Baixe o acessos.json (ou envie o acesso) para valer para o devedor.";
+    snd("ok");toast("Senha alterada.");
+  }catch(e){toast("Não consegui alterar a senha: "+e.message)}
+});
+$("acc_all").addEventListener("click",async function(){
+  if(noCrypto())return;
+  var P=accPw(),out={},n=0;
+  var names=Object.keys(people).filter(function(w){var c=cd(w);return c&&P[c]});
+  for(var i=0;i<names.length;i++){var w=names[i];try{var r=await accMake(w,P[cd(w)]);out[r.code]=r.token;n++}catch(e){}}
+  if(!n){toast("Nenhum devedor com acesso criado ainda.");return}
+  var b=new Blob([JSON.stringify(out)],{type:"application/json"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="acessos.json";document.body.appendChild(a);a.click();a.remove();
+  snd("ok");toast("acessos.json com "+n+" devedor(es). Coloque na pasta do devedor.html.");
+});
 
 /* ---------- início ---------- */
 loadLocal();purge();render();

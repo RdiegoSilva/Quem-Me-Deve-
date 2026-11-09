@@ -1,4 +1,4 @@
-var C="dividas-v21",F=["./","admin.html","devedor.html","style.css","devedor.css","script.js","devedor.js","shared.js","qrcode.js","efeitos.js","manifest.webmanifest","logo.png","banner.webp","side-art.png"];
+var C="dividas-v23",F=["./","index.html","devedor.html","style.css","devedor.css","script.js","devedor.js","shared.js","qrcode.js","efeitos.js","manifest.webmanifest","logo.png","banner.webp","side-art.png"];
 self.addEventListener("install",function(e){e.waitUntil(caches.open(C).then(function(c){return Promise.all(F.map(function(u){return c.add(u).catch(function(){})}))}));self.skipWaiting()});
 self.addEventListener("activate",function(e){e.waitUntil(caches.keys().then(function(k){return Promise.all(k.filter(function(n){return n!==C}).map(function(n){return caches.delete(n)}))}));self.clients.claim()});
 self.addEventListener("fetch",function(e){if(e.request.method!=="GET")return;if(/acessos\.json/.test(e.request.url))return;e.respondWith(fetch(e.request).then(function(r){var c=r.clone();caches.open(C).then(function(x){x.put(e.request,c)});return r}).catch(function(){return caches.match(e.request)}))});

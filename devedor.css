@@ -72,3 +72,38 @@ body.dvb{background:var(--bg);min-height:100vh}
   body.dvb{background:#fff}
   .dbt{break-inside:avoid}
 }
+
+/* ==========================================================
+   Tema noturno · área do devedor (igual ao painel)
+   ========================================================== */
+.lgn{background:radial-gradient(120% 90% at 50% 0%,#1b2bd0 0%,#0a1260 50%,#040824 100%)}
+.lc{border:1px solid rgba(130,150,255,.28);border-radius:28px;padding:34px 28px;box-shadow:0 50px 110px -30px rgba(0,0,30,.9)}
+.lc h1{font-family:var(--fd);font-size:25px;font-weight:700}
+.lgl{animation:floaty 6s ease-in-out infinite;filter:drop-shadow(0 18px 30px rgba(30,40,255,.55))}
+.dtop{background:rgba(5,11,48,.7);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(130,150,255,.14)}
+.dtop .brand b{font-family:var(--fd);font-weight:600}
+.dclock .sec{background:rgba(255,255,255,.08);border:1px solid rgba(130,150,255,.3)}
+body.dvb{background:radial-gradient(1000px 520px at 75% -6%,rgba(70,60,240,.28),transparent 62%),linear-gradient(180deg,#050b30,#040824) fixed}
+.dhero{position:relative;overflow:hidden;border-radius:26px;padding:26px 28px;background:linear-gradient(120deg,#1f55ee,#5a22d6);box-shadow:var(--glow)}
+.dhero::before{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(255,198,26,.4),transparent 65%);animation:halo 6s ease-in-out infinite;pointer-events:none}
+.dhero>*{position:relative;z-index:1}
+.dhero .go{border-radius:999px}
+.dnx{font-weight:600;line-height:1.5}
+.dbt{background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:var(--shadow);transition:border-color .25s,box-shadow .3s}
+.dbt:hover{border-color:rgba(120,150,255,.4);box-shadow:var(--glow)}
+.dbt h3{font-size:18px;font-weight:600}
+.dbt .rows{border-top:1px solid var(--bd)}
+.dbt .amt{font-family:var(--fd);font-weight:700}
+.dr{border-bottom:1px solid var(--bd);padding:13px 18px}
+.dr:last-child{border-bottom:0}
+.dr b{font-family:var(--fd);font-weight:600}
+.stp{font-weight:600;font-size:11.5px;padding:4px 12px}
+.pyr{border-bottom:1px solid var(--bd)}
+.pxk{background:color-mix(in srgb,var(--tx) 4%,transparent);border:1px solid var(--bd);border-radius:16px}
+.pxk .key{font-family:var(--fd)}
+.pxqr svg{border:1px solid var(--bd)}
+
+.pwr{position:relative}
+.pwr input{padding-right:50px}
+.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;padding:8px 10px;font-size:18px;line-height:1;border-radius:10px}
+.eye:hover{background:color-mix(in srgb,var(--tx) 8%,transparent)}
