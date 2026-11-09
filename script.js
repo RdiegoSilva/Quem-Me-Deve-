@@ -1055,9 +1055,22 @@ $("rc_i").addEventListener("click",function(){
     g.textAlign="right";g.font="800 11px system-ui,sans-serif";g.fillText("FALTA PAGAR",xr,y+30);g.font="800 28px system-ui,sans-serif";g.fillText(brl(R.tr),xr,y+66);
     g.textAlign="center";g.fillStyle="#6a79a8";g.font="12px system-ui,sans-serif";g.fillText("Este recibo confirma os pagamentos registrados até "+R.date+". Obrigado!",W/2,y+90+36);
     cv.toBlob(function(b){
+      if(!b){toast("Não consegui gerar a imagem do recibo.");return}
       var f=new File([b],"recibo-"+R.name.replace(/\s+/g,"-")+".png",{type:"image/png"});
-      if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){});return}
-      var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();a.remove();toast("Imagem do recibo baixada.");snd("ok");
+      var dg=$("recimg");
+      if(!dg){
+        dg=document.createElement("dialog");dg.id="recimg";
+        dg.innerHTML='<div style="display:grid;gap:12px;max-width:min(560px,92vw);padding:4px"><img id="recimg_i" alt="Recibo" style="width:100%;height:auto;border-radius:12px;background:#fff"><p class="s" style="margin:0;text-align:center">Toque e segure na imagem para salvar ou compartilhar.</p><div class="fg"><a class="add" id="recimg_d" style="text-align:center;text-decoration:none;padding:12px">Baixar</a><button class="sec" type="button" id="recimg_s">Compartilhar</button></div><button class="sec" type="button" id="recimg_x">Fechar</button></div>';
+        document.body.appendChild(dg);
+        $("recimg_x").addEventListener("click",function(){closeDlg(dg)});
+        dg.addEventListener("click",function(e){if(e.target===dg)closeDlg(dg)});
+      }
+      if(dg._u)URL.revokeObjectURL(dg._u);
+      dg._u=URL.createObjectURL(b);dg._f=f;
+      $("recimg_i").src=dg._u;$("recimg_d").href=dg._u;$("recimg_d").download=f.name;
+      $("recimg_s").hidden=!(navigator.canShare&&navigator.canShare({files:[f]}));
+      $("recimg_s").onclick=function(){navigator.share({files:[dg._f]}).catch(function(){})};
+      if(!dg.open)dg.showModal();snd("ok");
     });
   }
 });

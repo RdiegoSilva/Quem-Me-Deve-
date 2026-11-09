@@ -7,14 +7,17 @@
 <meta name="theme-color" content="#050b30">
 <script>try{var t=localStorage.getItem("dv-th");document.documentElement.dataset.theme=t===""?"light":(t||"dark")}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest-devedor.webmanifest">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=24">
 <link rel="stylesheet" href="devedor.css?v=24">
+<link rel="stylesheet" href="tema.css?v=6">
 </head>
 <body class="dvb">
+<canvas id="fx" aria-hidden="true"></canvas>
 
 <!-- ENTRAR -->
 <div id="login" class="lgn">
@@ -25,9 +28,11 @@
 <div><label for="l_id">ID</label><input id="l_id" placeholder="Ex.: C001" autocapitalize="characters" autocomplete="username" required></div>
 <div><label for="l_pw">Senha</label><div class="pwr"><input id="l_pw" type="password" autocomplete="current-password" autocapitalize="off" spellcheck="false" required><button type="button" class="eye" id="l_eye" aria-label="Mostrar senha" title="Mostrar senha">👁</button></div></div>
 <label class="ck"><input type="checkbox" id="l_rm" checked> Lembrar meu ID neste aparelho</label>
+<label class="ck"><input type="checkbox" id="l_au" checked> Entrar automaticamente neste aparelho</label>
 <button class="add big" type="submit" id="l_go">Entrar</button>
 <p class="err" id="l_err" role="alert"></p>
 <button type="button" class="lnk" id="l_forgot">Esqueci minha senha</button>
+<button type="button" class="sec inst" id="l_inst" hidden>📲 Baixar app</button>
 <p class="s foot">O ID e a senha são enviados por quem cobra. Só você consegue ver os seus dados.</p>
 </form>
 </div>
@@ -36,7 +41,7 @@
 <div id="app" hidden>
 <header class="dtop">
 <div class="brand"><img src="logo.png" alt=""><div><b id="d_hi">Olá</b><span class="s" id="d_id"></span></div></div>
-<div class="dclock"><span id="d_clk"></span><button class="tb-i" id="d_print" title="Imprimir meu extrato" aria-label="Imprimir">🖨</button><button class="sec" id="d_out">Sair</button></div>
+<div class="dclock"><span id="d_clk"></span><button class="tb-i inst" id="d_inst" title="Baixar o app" aria-label="Baixar app" hidden>📲</button><button class="tb-i" id="d_th" title="Trocar modo claro/noturno" aria-label="Trocar tema" onclick="var r=document.documentElement,l=r.dataset.theme!=='light';r.dataset.theme=l?'light':'dark';try{localStorage.setItem('dv-th',l?'':'dark')}catch(e){}this.textContent=l?'☾':'☀'">☀</button><button class="tb-i" id="d_print" title="Imprimir meu extrato" aria-label="Imprimir">🖨</button><button class="sec" id="d_out">Sair</button></div>
 </header>
 
 <main class="dmain">
@@ -74,6 +79,7 @@
 <div id="toast" role="status"><span id="tm"></span></div>
 <script src="qrcode.js"></script>
 <script src="shared.js?v=22"></script>
-<script src="devedor.js?v=24"></script>
+<script src="efeitos.js?v=22"></script>
+<script src="devedor.js?v=25"></script>
 </body>
 </html>

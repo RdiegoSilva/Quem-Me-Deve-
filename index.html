@@ -16,6 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=24">
+<link rel="stylesheet" href="tema.css?v=6">
 </head>
 <body>
 <div class="app">
@@ -43,7 +44,7 @@
 <main class="page">
 <canvas id="fx" aria-hidden="true"></canvas>
 <section id="v_home">
-<div class="banner rise"><img src="banner.webp" alt="Quem Me Deve? Controle suas dívidas de forma simples e eficiente!"></div>
+<div class="hero rise"><div class="hero-t"><h1>Quem Me <em>Deve?</em></h1><p>Controle suas dívidas de forma simples e eficiente!</p><button type="button" class="go hero-b" onclick="document.getElementById('rg').click()"><span class="gi">+</span> Adicionar Nova Dívida</button></div><div class="hero-a" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
 
 <div class="kpis">
 <div class="kpi k1 rise"><span class="ki"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h14a1 1 0 0 0 1-1v-3"/><path d="M21 12v4h-5a2 2 0 0 1 0-4z"/></svg></span><div><small>Total Devido</small><b id="tt">R$ 0,00</b><em id="ktn"></em></div></div>
@@ -274,7 +275,7 @@
 <div id="toast" role="status"><span id="tm"></span><button id="tu">Desfazer</button><button id="t2" hidden></button></div>
 <canvas id="fxc" aria-hidden="true"></canvas>
 <script src="shared.js?v=22"></script>
-<script src="script.js?v=25"></script>
-<script src="efeitos.js?v=21"></script>
+<script src="script.js?v=26"></script>
+<script src="efeitos.js?v=22"></script>
 </body>
 </html>

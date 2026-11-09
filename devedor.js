@@ -74,6 +74,7 @@ $("lf").addEventListener("submit",async function(e){
   $("l_go").disabled=false;$("l_go").textContent="Entrar";
   if(r.err){$("l_err").textContent=r.err;return}
   if($("l_rm").checked)LS.set("qmd-id",QM.normId(id));
+  if($("l_au").checked)LS.set("qmd-au",JSON.stringify({id:QM.normId(id),pw:pw}));else{try{localStorage.removeItem("qmd-au")}catch(e){}}
   enter(r.d,id,pw);
 });
 $("l_forgot").addEventListener("click",function(){
@@ -81,7 +82,7 @@ $("l_forgot").addEventListener("click",function(){
   var t="Olá! Esqueci a minha senha da Área do devedor."+(id?" Meu ID é "+id+".":"")+" Pode me enviar uma nova?";
   window.open("https://wa.me/"+waNum()+"?text="+encodeURIComponent(t),"_blank","noopener");
 });
-$("d_out").addEventListener("click",function(){SS.del("qmd-s");D=null;$("app").hidden=true;$("login").hidden=false;$("l_pw").value="";$("l_err").textContent=""});
+$("d_out").addEventListener("click",function(){SS.del("qmd-s");try{localStorage.removeItem("qmd-au")}catch(e){}$("l_au").checked=false;D=null;$("app").hidden=true;$("login").hidden=false;$("l_pw").value="";$("l_err").textContent=""});
 $("l_eye").addEventListener("click",function(){var i=$("l_pw"),h=i.type==="password";i.type=h?"text":"password";$("l_eye").textContent=h?"🙈":"👁";$("l_eye").setAttribute("aria-label",h?"Ocultar senha":"Mostrar senha");i.focus()});
 $("d_print").addEventListener("click",function(){window.print()});
 window.addEventListener("beforeprint",function(){document.querySelectorAll("details.dbt").forEach(function(d){d.open=true})});
@@ -180,11 +181,24 @@ $("pq_wa").addEventListener("click",function(){
 document.querySelectorAll("[data-close]").forEach(function(b){b.addEventListener("click",function(){var d=$(b.dataset.close);if(d.open)d.close()})});
 $("pgd").addEventListener("click",function(e){if(e.target===$("pgd"))$("pgd").close()});
 
+/* ---------- baixar app ---------- */
+var ip=null,standalone=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone,ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+function instShow(v){document.querySelectorAll(".inst").forEach(function(b){b.hidden=!v})}
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();ip=e;if(!standalone)instShow(true)});
+window.addEventListener("appinstalled",function(){ip=null;instShow(false);toast("App instalado!")});
+if(!standalone&&ios)instShow(true);
+document.querySelectorAll(".inst").forEach(function(b){b.addEventListener("click",function(){
+  if(ip){ip.prompt();ip.userChoice.then(function(){ip=null;instShow(false)},function(){})}
+  else if(ios)toast("No iPhone: toque em Compartilhar e depois em Adicionar à Tela de Início.");
+  else toast("Use o menu do navegador e escolha Instalar app ou Adicionar à tela inicial.");
+})});
+if("serviceWorker" in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register("sw.js").catch(function(){})}
+
 /* ---------- início ---------- */
 var rid=LS.get("qmd-id");
 if(hashTok)$("l_id").value=hashTok.id;else if(rid)$("l_id").value=rid;
 (async function(){
-  var s=SS.get("qmd-s");if(!s)return;
-  try{var o=JSON.parse(s),r=await tryLogin(o.id,o.pw);if(r.d)enter(r.d,o.id,o.pw)}catch(e){}
+  var s=SS.get("qmd-s")||LS.get("qmd-au");if(!s)return;
+  try{var o=JSON.parse(s),r=await tryLogin(o.id,o.pw);if(r.d)enter(r.d,o.id,o.pw);else{SS.del("qmd-s");try{localStorage.removeItem("qmd-au")}catch(e){}}}catch(e){}
 })();
 })();

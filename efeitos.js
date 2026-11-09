@@ -16,7 +16,7 @@ function dark(){return root.dataset.theme==="dark"}
 
 /* ---------- partículas ---------- */
 var PAL={
-  page:function(){return dark()?{dot:"140,185,255",dotA:.36,line:"140,185,255",lineA:.16,coin:"255,205,60"}:{dot:"26,108,245",dotA:.28,line:"26,108,245",lineA:.12,coin:"245,170,0"}},
+  page:function(){return dark()?{dot:"242,201,76",dotA:.6,line:"242,201,76",lineA:.28,coin:"255,205,60"}:{dot:"184,134,11",dotA:.34,line:"184,134,11",lineA:.16,coin:"212,160,23"}},
   side:function(){return {dot:"255,255,255",dotA:.42,line:"255,255,255",lineA:.17,coin:"255,205,60"}}
 };
 function Field(cv,kind,density){
